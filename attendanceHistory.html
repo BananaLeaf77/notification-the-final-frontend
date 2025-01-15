@@ -518,6 +518,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    console.log(data)
                     let truancyData = data.data;
     
                     // Sort truancy data by created_at in descending order (most recent first)
@@ -544,8 +545,8 @@
                             <td>${record.parent.name}</td>
                             <td>${record.user.name} (${record.user.role})</td>
                             <td>${record.subject.name}</td>
-                            <td>${record.whatsapp_status ? "✅" : "❌"}</td>
-                            <td>${record.email_status ? "✅" : "❌"}</td>
+                            <td>${record.whatsapp_status ? "O" : "X"}</td>
+                            <td>${record.email_status ? "O" : "X"}</td>
                         `;
     
                         // Add click event to navigate to detailStudent.html with the student ID
