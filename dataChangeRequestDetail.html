@@ -632,7 +632,7 @@
                 window.location.href = "dataChangeRequest.html";
               }, 3000);
             }else{
-              messageElement.innerHTML = data.message+" "+data.error;
+              messageElement.innerHTML = data.message+", "+data.error;
               messageElement.classList.remove("text-success");
               messageElement.classList.add("text-danger");
               $('#APIResponse').modal('show');
@@ -655,7 +655,6 @@
 
       document.getElementById("confirmAPIResponse").addEventListener("click", function() {
         $('#APIResponse').modal('hide');
-        window.location.href = "dataChangeRequest.html"
       });
 
       function logout() {

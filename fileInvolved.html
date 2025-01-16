@@ -602,7 +602,7 @@
               messageElement.classList.add("text-danger");
               $('#APIResponse').modal('show');
             }
-
+            fileInput.value = "";
         } catch (error) {
             console.error('Error during file upload:', error);
             alert('An error occurred during the file upload.');
