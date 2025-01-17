@@ -4,6 +4,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>SINOAN Attendance History</title>
     <meta name="viewport" content="width=1024">
+    <meta charset="UTF-8">
 
     <link
       rel="icon"
@@ -545,8 +546,8 @@
                             <td>${record.parent.name}</td>
                             <td>${record.user.name} (${record.user.role})</td>
                             <td>${record.subject.name}</td>
-                            <td>${record.whatsapp_status ? "O" : "X"}</td>
-                            <td>${record.email_status ? "O" : "X"}</td>
+                            <td>${record.whatsapp_status ? "✅" : "❌"}</td>
+                            <td>${record.email_status ? "✅" : "❌"}</td>
                         `;
     
                         // Add click event to navigate to detailStudent.html with the student ID
