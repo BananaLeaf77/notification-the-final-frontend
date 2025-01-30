@@ -331,62 +331,66 @@
                         <div class="col-md-6 col-lg-4">
                           <label><b>Student Data</b></label>
                           <div class="form-group">
-                            <label for="studentName">Name</label>
-                            <input type="text" class="form-control" id="studentName" placeholder="Enter Student Name" required />
+                              <label for="studentNSN">NSN (National Student Number) <span class="text-danger">*</span></label>
+                              <input type="number" class="form-control" id="studentNSN" maxlength="10" placeholder="Enter Student NSN" required />
                           </div>
                           <div class="form-group">
-                            <label for="studentGrade">Grade</label>
-                            <input type="number" class="form-control" id="studentGrade" min="1" max="99" oninput="validateInput(this)" placeholder="1,2,3,4,5,6,7,8,9, ..." required>
+                              <label for="studentName">Name <span class="text-danger">*</span></label>
+                              <input type="text" class="form-control" id="studentName" placeholder="Enter Student Name" required />
                           </div>
                           <div class="form-group">
-                            <label for="studentGradeLabel">Grade Label</label>
-                            <input type="text" class="form-control" id="studentGradeLabel" placeholder="A,B,C,D..." maxlength="3" required />
+                              <label for="studentGrade">Grade <span class="text-danger">*</span></label>
+                              <input type="number" class="form-control" id="studentGrade" min="1" max="99" oninput="validateInput(this)" placeholder="1,2,3,4,5,6,7,8,9, ..." required>
                           </div>
                           <div class="form-group">
-                            <label for="studentTelephone">Telephone</label>
-                            <input type="tel" class="form-control" id="studentTelephone" placeholder="08xx" maxlength="13" pattern="\d{1,13}" required />
+                              <label for="studentGradeLabel">Grade Label <span class="text-danger">*</span></label>
+                              <input type="text" class="form-control" id="studentGradeLabel" placeholder="A,B,C,D..." maxlength="3" required />
                           </div>
                           <div class="form-group">
-                            <label for="studentGender">Gender</label>
-                            <div class="d-flex">
-                              <div class="form-check">
-                                <input class="form-check-input" type="radio" name="studentGender" id="studentMale" value="male" required />
-                                <label class="form-check-label" for="studentMale">Male</label>
+                              <label for="studentTelephone">Telephone <span class="text-danger">*</span></label>
+                              <input type="tel" class="form-control" id="studentTelephone" placeholder="08xx" oninput="validateTelephone(this)" maxlength="13" pattern="\d{13}" required />
+                          </div>
+                          <div class="form-group">
+                              <label for="studentGender">Gender <span class="text-danger">*</span></label>
+                              <div class="d-flex">
+                                  <div class="form-check">
+                                      <input class="form-check-input" type="radio" name="studentGender" id="studentMale" value="male" required />
+                                      <label class="form-check-label" for="studentMale">Male</label>
+                                  </div>
+                                  <div class="form-check ml-2">
+                                      <input class="form-check-input" type="radio" name="studentGender" id="studentFemale" value="female" />
+                                      <label class="form-check-label" for="studentFemale">Female</label>
+                                  </div>
                               </div>
-                              <div class="form-check ml-2">
-                                <input class="form-check-input" type="radio" name="studentGender" id="studentFemale" value="female" />
-                                <label class="form-check-label" for="studentFemale">Female</label>
-                              </div>
-                            </div>
                           </div>
                         </div>
                         <!-- Parent Section -->
                         <div class="col-md-6 col-lg-4">
                           <label><b>Parent Data</b></label>
                           <div class="form-group">
-                            <label for="parentName">Name</label>
-                            <input type="text" class="form-control" id="parentName" placeholder="Enter Parent Name" required />
+                              <label for="parentName">Name <span class="text-danger">*</span></label>
+                              <input type="text" class="form-control" id="parentName" placeholder="Enter Parent Name" required />
                           </div>
                           <div class="form-group">
-                            <label for="parentTelephone">Telephone</label>
-                            <input type="tel" class="form-control" id="parentTelephone" placeholder="08xx" maxlength="13" pattern="\d{1,13}" required />
+                              <label for="parentTelephone">Telephone <span class="text-danger">*</span></label>
+                              <input type="tel" class="form-control" id="parentTelephone" oninput="validateTelephone(this)" placeholder="08xx" maxlength="13" pattern="\d{13}" required />
                           </div>
                           <div class="form-group">
-                            <label for="parentEmail">Email (Optional)</label>
-                            <input type="email" class="form-control" id="parentEmail" placeholder="Enter Email" />
+                              <label for="parentEmail">Email (Optional)</label>
+                              <input type="email" class="form-control" id="parentEmail" placeholder="Enter Email" />
                           </div>
                           <div class="form-group">
-                            <label for="parentGender">Gender</label>
-                            <div class="d-flex">
-                              <div class="form-check">
-                                <input class="form-check-input" type="radio" name="parentGender" id="parentMale" value="male" required />
-                                <label class="form-check-label" for="parentMale">Male</label>
+                              <label for="parentGender">Gender <span class="text-danger">*</span></label>
+                              <div class="d-flex">
+                                  <div class="form-check">
+                                      <input class="form-check-input" type="radio" name="parentGender" id="parentMale" value="male" required />
+                                      <label class="form-check-label" for="parentMale">Male</label>
+                                  </div>
+                                  <div class="form-check ml-2">
+                                      <input class="form-check-input" type="radio" name="parentGender" id="parentFemale" value="female" />
+                                      <label class="form-check-label" for="parentFemale">Female</label>
+                                  </div>
                               </div>
-                              <div class="form-check ml-2">
-                                <input class="form-check-input" type="radio" name="parentGender" id="parentFemale" value="female" />
-                                <label class="form-check-label" for="parentFemale">Female</label>
-                              </div>
-                            </div>
                           </div>
                         </div>
                       <div class="card-action">
@@ -494,8 +498,28 @@
     <script src="assets/js/apiHost.js"></script>
 
     <script>
-
+      function validateTelephone(input) {
+        // Remove any non-numeric characters
+        input.value = input.value.replace(/\D/g, '');
+        
+        // Ensure max length of 10
+        if (input.value.length > 13) {
+          input.value = input.value.slice(0, 13);
+        }
+      }
       function validateInput(input) {
+        // Remove any invalid characters (non-numeric and spaces)
+        input.value = input.value.replace(/[^0-9]/g, '');
+    
+        // Ensure the value stays within the range of 1-99
+        if (input.value !== '') {
+            const num = parseInt(input.value, 10);
+            if (num < 1) input.value = '1';
+            if (num > 99) input.value = '99';
+        }
+      }
+
+      function validateNsnInput(input) {
         // Remove any invalid characters (non-numeric and spaces)
         input.value = input.value.replace(/[^0-9]/g, '');
     
@@ -524,6 +548,7 @@
       
         const data = {
           student: {
+            nsn: document.getElementById('studentNSN').value,
             name: document.getElementById('studentName').value,
             grade: parseInt(document.getElementById('studentGrade').value, 10),
             grade_label: document.getElementById('studentGradeLabel').value,

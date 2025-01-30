@@ -50,7 +50,7 @@
           <div class="modal-header">
             <div class="d-flex flex-column w-100">  
                 <h5 class="modal-title mb-1" id="updateSPModalLabel">Update Student and Parent</h5>
-                <p class="text-muted mb-0" style="font-size: 14px;">Please modify or input only the required data. Do not input blank data, except for the email field.</p>
+                <p class="text-muted mb-0" style="font-size: 14px;">Please modify or enter only the required data. Do not leave any fields blank, except for the parent email field.</p>
             </div>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="position: absolute; top: 15px; right: 15px;">
                 <span aria-hidden="true">&times;</span>
@@ -60,61 +60,61 @@
           <div class="modal-body">
             <div class="row">
               <!-- Student Info - Left Side -->
-              <div class="col-md-6">
+                <div class="col-md-6">
                 <div class="form-group">
-                  <label for="modalStudentName">Student Name</label>
+                  <label for="modalStudentNSN">NSN (National Student Number) <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="modalStudentNSN" maxlength="10" placeholder="Enter Student NSN" 
+                          oninput="validateNSN(this)" pattern="\d{10}" required>
+                </div>
+                <div class="form-group">
+                  <label for="modalStudentName">Student Name <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" id="modalStudentName" placeholder="Enter Student Name">
                 </div>
                 <div class="form-group">
-                  <label for="modalStudentGrade">Grade</label>
+                  <label for="modalStudentGrade">Grade <span class="text-danger">*</span></label>
                   <input type="number" class="form-control" id="modalStudentGrade" min="1" max="99" oninput="validateInput(this)" placeholder="1,2,3,4,5,6,7,8,9, ..." required>
                 </div>
                 <div class="form-group">
-                  <label for="modalStudentGradeLabel">Grade Label</label>
+                  <label for="modalStudentGradeLabel">Grade Label <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" id="modalStudentGradeLabel" placeholder="A,B,C,D...">
                 </div>
                 <div class="form-group">
-                  <label for="modalStudentGender">Gender</label><br>
-                  
+                  <label for="modalStudentGender">Gender <span class="text-danger">*</span></label><br>
                   <div class="custom-control custom-radio custom-control-inline">
                       <input type="radio" id="modalStudentGenderMale" name="studentGender" value="male" class="custom-control-input">
                       <label class="custom-control-label" for="modalStudentGenderMale">male</label>
                   </div>
-                  
                   <div class="custom-control custom-radio custom-control-inline">
                       <input type="radio" id="modalStudentGenderFemale" name="studentGender" value="female" class="custom-control-input">
                       <label class="custom-control-label" for="modalStudentGenderFemale">female</label>
                   </div>
               </div>
-              
                 <div class="form-group">
-                  <label for="modalStudentTelephone">Telephone</label>
-                  <input type="text" class="form-control" id="modalStudentTelephone" placeholder="08xx" maxlength="13" pattern="\d{1,13}" required />
+                  <label for="modalStudentTelephone">Telephone <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="modalStudentTelephone" placeholder="08xx" oninput="validateTelephone(this)" maxlength="13" pattern="\d{13}" required />
                 </div>
               </div>
               
               <!-- Parent Info - Right Side -->
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="modalParentName">Parent Name</label>
+                  <label for="modalParentName">Parent Name <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" id="modalParentName" placeholder="Parent Name">
                 </div>
                 <div class="form-group">
-                  <label for="modalParentGender">Gender</label><br>
-                  
+                  <label for="modalParentGender">Gender <span class="text-danger">*</span></label><br>
                   <div class="custom-control custom-radio custom-control-inline">
                       <input type="radio" id="modalParentGenderMale" name="ParentGender" value="male" class="custom-control-input">
                       <label class="custom-control-label" for="modalParentGenderMale">male</label>
                   </div>
-                  
                   <div class="custom-control custom-radio custom-control-inline">
                       <input type="radio" id="modalParentGenderFemale" name="ParentGender" value="female" class="custom-control-input">
                       <label class="custom-control-label" for="modalParentGenderFemale">female</label>
                   </div>
               </div>
                 <div class="form-group">
-                  <label for="modalParentTelephone">Parent Telephone</label>
-                  <input type="text" class="form-control" id="modalParentTelephone" placeholder="08xx" maxlength="13" pattern="\d{1,13}" required />
+                  <label for="modalParentTelephone">Parent Telephone <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="modalParentTelephone" oninput="validateTelephone(this)" placeholder="08xx" maxlength="13" pattern="\d{13}" required />
                 </div>
                 <div class="form-group">
                   <label for="modalParentEmail">Parent Email (optional)</label>
@@ -130,6 +130,7 @@
         </div>
       </div>
     </div>
+
     
     <!-- Unauthorized -->
     <div class="modal fade" id="unauthorizedModal" tabindex="-1" aria-labelledby="unauthorizedModalLabel" aria-hidden="true">
@@ -698,6 +699,27 @@
     <script src="assets/js/apiHost.js"></script>
 
     <script>
+
+      function validateNSN(input) {
+          // Remove any non-numeric characters
+          input.value = input.value.replace(/\D/g, '');
+          
+          // Ensure max length of 10
+          if (input.value.length > 10) {
+            input.value = input.value.slice(0, 10);
+          }
+      }
+
+      function validateTelephone(input) {
+          // Remove any non-numeric characters
+          input.value = input.value.replace(/\D/g, '');
+          
+          // Ensure max length of 10
+          if (input.value.length > 13) {
+            input.value = input.value.slice(0, 13);
+          }
+      }
+
       function validateInput(input) {
         // Remove any invalid characters (non-numeric and spaces)
         input.value = input.value.replace(/[^0-9]/g, '');
@@ -1224,6 +1246,7 @@
       const token = localStorage.getItem("authToken");
   
       // Get student data
+      const modalStudentNSN = document.getElementById("modalStudentNSN");
       const modalStudentName = document.getElementById("modalStudentName");
       const modalStudentGrade = document.getElementById("modalStudentGrade");
       const modalStudentGradeLabel = document.getElementById("modalStudentGradeLabel");
@@ -1242,6 +1265,7 @@
       const studentId = modalStudentName.getAttribute("data-student-id");
   
       // Collect student data
+      const studentNSN = modalStudentNSN.value;
       const studentName = modalStudentName.value;
       const studentGrade = modalStudentGrade.value;
       const studentGradeLabel = modalStudentGradeLabel.value;
@@ -1257,8 +1281,9 @@
       // Prepare the payload to send
       const payload = {
           student: {
-              name: studentName,
-              grade: parseInt(studentGrade, 10),
+            nsn: studentNSN,
+            name: studentName,
+            grade: parseInt(studentGrade, 10),
               grade_label: studentGradeLabel,
               gender: studentGender,
               telephone: studentTelephone
@@ -1286,7 +1311,6 @@
           .then((data) => {
               if (data.success) {
                   // Success message
-                  console.log("succes")
                   messageElement.innerHTML = data.message;
                   messageElement.classList.remove("text-danger");
                   messageElement.classList.add("text-success");
@@ -1338,6 +1362,8 @@
   
               // Set student_id in the student name input field
               const studentNameInput = document.getElementById("modalStudentName");
+              const studentNSNInput = document.getElementById("modalStudentNSN");
+              studentNSNInput.value = student.nsn;
               studentNameInput.value = student.name;
               studentNameInput.setAttribute("data-student-id", student.student_id); // Set student_id here
   

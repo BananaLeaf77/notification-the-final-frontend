@@ -53,15 +53,19 @@
                   </button>
               </div>
               <div class="modal-body">
+                  <div class="form-group">
+                    <label for="modalSubjectCode">Subject Code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="modalSubjectCode" placeholder="xxxxx" maxlength="5">
+                  </div>
                   <!-- Username Field -->
                   <div class="form-group">
-                      <label for="modalSubjectName">Subject Name</label>
-                      <input type="text" class="form-control" id="modalSubjectName" placeholder="Biology 7">
+                      <label for="modalSubjectName">Subject Name <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="modalSubjectName" placeholder="Math 7">
                   </div>
                   
                   <!-- Password Field -->
                   <div class="form-group">
-                      <label for="modalSubjectGrade">Subject Grade</label>
+                      <label for="modalSubjectGrade">Subject Grade <span class="text-danger">*</span></label>
                       <input type="number" class="form-control" id="modalSubjectGrade" min="1" max="99" oninput="validateInput(this)" placeholder="1,2,3,4,5,6,7,8,9, ..." required>
                   </div>
               </div>
@@ -426,11 +430,11 @@
                             <i class="fas fa-user-plus"></i> Add
                           </a>
                         </div>
-                        <div>
+                        <!-- <div>
                           <a href="#" class="btn btn-danger btn-round" onclick="showMassDeleteModal()">
                               <i class="fas fa-trash"></i> Delete
                           </a>
-                        </div>
+                        </div> -->
                       </div>
                     </div>
                   </div>
@@ -441,9 +445,9 @@
                           <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Select</th>
+                                    <th>Subject Code</th>
                                     <th>Grade</th>
-                                    <th>Subject</th>
+                                    <th>Subject Name</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -749,21 +753,16 @@
                       const row = document.createElement("tr");
 
                       row.innerHTML = `
-                          <td>
-                              <input class="custom-checkbox" type="checkbox" name="selectSubject" value="${subject.subject_id}" />
-                          </td>
+                          <td>${subject.subject_code}</td>
                           <td>${subject.grade}</td>
                           <td>${subject.name}</td>
                           <td>
                             <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); runSubjectUpdateModal(${subject.subject_id})">Update</button>
-                            <button class="btn btn-danger btn-sm delete-btn" onclick="event.stopPropagation(); showDeleteModal(${subject.subject_id}, '${subject.name}')">Delete</button>
                           </td>
                       `;
 
+                      // <button class="btn btn-danger btn-sm delete-btn" onclick="event.stopPropagation(); showDeleteModal(${subject.subject_id}, '${subject.name}')">Delete</button>
                       // Add checkbox event listener for user selection
-                      const checkbox = row.querySelector('.custom-checkbox');
-                      checkbox.addEventListener('change', (event) => toggleUserSelection(event, subject.subject_id));
-
                       subjectTable.appendChild(row);
                   });
               } else {
@@ -776,15 +775,18 @@
       document.getElementById("saveChanges").addEventListener("click", function () {
         const token = localStorage.getItem("authToken");
         const modalSubjectName = document.getElementById("modalSubjectName");
+        const modalSubjectCode = document.getElementById("modalSubjectCode");
     
         const subjectId = modalSubjectName.getAttribute("data-subject-id");
     
         const subjectName = modalSubjectName.value;
+        const subjectCode = modalSubjectCode.value;
         const grade = document.getElementById("modalSubjectGrade").value;
     
         const messageElement = document.getElementById("msgs");
     
         const payload = {
+            subject_code: subjectCode,
             name: subjectName,
             grade: parseInt(grade, 10), // Ensure grade is an integer
         };
