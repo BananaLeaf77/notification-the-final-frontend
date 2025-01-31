@@ -332,7 +332,8 @@
                           <label><b>Student Data</b></label>
                           <div class="form-group">
                               <label for="studentNSN">NSN (National Student Number) <span class="text-danger">*</span></label>
-                              <input type="number" class="form-control" id="studentNSN" maxlength="10" placeholder="Enter Student NSN" required />
+                              <input type="text" class="form-control" id="studentNSN" maxlength="10" placeholder="Enter Student NSN" 
+                              oninput="validateNSN(this)" pattern="\d{10}" required>
                           </div>
                           <div class="form-group">
                               <label for="studentName">Name <span class="text-danger">*</span></label>
@@ -373,7 +374,7 @@
                           </div>
                           <div class="form-group">
                               <label for="parentTelephone">Telephone <span class="text-danger">*</span></label>
-                              <input type="tel" class="form-control" id="parentTelephone" oninput="validateTelephone(this)" placeholder="08xx" maxlength="13" pattern="\d{13}" required />
+                              <input type="text" class="form-control" id="parentTelephone" oninput="validateTelephone(this)" placeholder="08xx" maxlength="13" pattern="\d{13}" required />
                           </div>
                           <div class="form-group">
                               <label for="parentEmail">Email (Optional)</label>
@@ -496,8 +497,16 @@
 
     <!-- API HIT -->
     <script src="assets/js/apiHost.js"></script>
-
     <script>
+      function validateNSN(input) {
+          // Remove any non-numeric characters
+          input.value = input.value.replace(/\D/g, '');
+          
+          // Ensure max length of 10
+          if (input.value.length > 10) {
+            input.value = input.value.slice(0, 10);
+          }
+      }
       function validateTelephone(input) {
         // Remove any non-numeric characters
         input.value = input.value.replace(/\D/g, '');

@@ -327,11 +327,15 @@
                       <div class="row">
                         <div class="col-md-6 col-lg-4">
                           <div class="form-group">
-                            <label for="username">Subject Name</label>
+                            <label for="subjectCode">Subject Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="subjectCode" placeholder="xxxxx" maxlength="5" required />
+                          </div>
+                          <div class="form-group">
+                            <label for="username">Subject Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="subjectName" placeholder="history 7, biology 8..." required />
                           </div>
                           <div class="form-group">
-                            <label for="grade">Grade</label>
+                            <label for="grade">Grade <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="subjectGrade" min="1" max="99" oninput="validateInput(this)" placeholder="1,2,3,4,5,6,7,8,9, ..." required>
                           </div>
                         </div>
@@ -466,6 +470,7 @@
         e.preventDefault();
         
         const data = {
+          subject_code: document.getElementById('subjectCode').value, 
           name: document.getElementById('subjectName').value, 
           grade: parseInt(document.getElementById('subjectGrade').value, 10), 
         };
