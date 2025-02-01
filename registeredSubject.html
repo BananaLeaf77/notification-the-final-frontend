@@ -821,6 +821,7 @@
     function runSubjectUpdateModal(subjectId) {
         const token = localStorage.getItem("authToken");
         const messageElement = document.getElementById("msgs");
+        const modalSubjectCode = document.getElementById("modalSubjectCode");
         const modalSubjectName = document.getElementById("modalSubjectName");
         const modalSubjectGrade = document.getElementById("modalSubjectGrade");
     
@@ -836,7 +837,7 @@
             .then((data) => {
                 if (data.success) {
                     const subjectData = data.data;
-    
+                    modalSubjectCode.value = subjectData.subject_code;
                     modalSubjectName.value = subjectData.name;
                     modalSubjectGrade.value = subjectData.grade;
     

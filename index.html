@@ -485,7 +485,7 @@
         <div class="container">
           <div class="page-inner">
             <div
-              class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4"
+              class="d-flex align-items-left align-items-md-center flex-column flex-md-row"
             >
               <div>
                 <h3 class="fw-bold mb-3">Dashboard</h3>
@@ -576,9 +576,17 @@
                         </div>
                       </div>
                     </div>
-                    <p class="card-category">
-                      Student list complete with class, name and gender info
-                    </p>
+                    <!-- Grade Toggle Buttons -->
+                    <p>Filter by Grade:</p>
+                    <div id="gradeButtons" class="btn-group" role="group">
+                        <!-- Buttons will be dynamically added here -->
+                    </div>
+                    <!-- Grade Label Dropdown -->
+                      <p>Filter by Grade Label:</p>
+                      <select id="gradeLabelDropdown" class="form-select">
+                          <option value="">All</option>
+                          <!-- Options will be dynamically added here -->
+                      </select>
                   </div>
                   <div class="card-body">
                     <div class="row">
@@ -1152,8 +1160,9 @@
       // Array to store selected student IDs
       let selectedStudentIds = [];
 
-      // Fetch students and populate the table
-      function fetchStudents(token) {
+      let students = [];
+
+        function fetchStudents(token) {
         fetch(`${apiUrl}/student/get-all`, {
             method: "GET",
             headers: {
@@ -1163,34 +1172,134 @@
         })
         .then(response => response.json())
         .then(data => {
-            const studentTable = document.getElementById('studentTable');
-            studentTable.innerHTML = '';
-    
-            // Process and sort students by class (merge grade and grade_label)
-            const students = data.data.map(student => ({
-                ...student,
-                class: `${student.grade} ${student.grade_label}` // Merge grade and grade_label
-            }));
-            
-            const sortedStudents = students.sort((a, b) => sortStudentsByClass(a.class, b.class));
-    
-            // Populate table rows
-            sortedStudents.forEach(student => {
-                const row = createStudentRow(student);
-                studentTable.appendChild(row);
-            });
+            if (data.success) {
+                students = data.data;
+
+                // Sort students by grade and grade label
+                students.sort((a, b) => {
+                    let gradeA = parseInt(a.grade);
+                    let gradeB = parseInt(b.grade);
+
+                    if (gradeA !== gradeB) {
+                        return gradeA - gradeB; // Sort numerically first
+                    }
+
+                    let labelA = a.grade_label || ""; // Handle cases where grade_label is missing
+                    let labelB = b.grade_label || "";
+
+                    return labelA.localeCompare(labelB); // Sort alphabetically
+                });
+
+                console.log("Sorted students:", students);
+                initializeFiltersAndTable();
+            } else {
+                console.error("Failed to fetch students:", data.message);
+            }
         })
         .catch(error => {
-          const messageElement = document.getElementById("msgs");
-          messageElement.innerHTML = data.error; 
-          messageElement.classList.remove("text-success");
-          messageElement.classList.add("text-danger");
-      
-          const apiResponseModal = new bootstrap.Modal(document.getElementById("APIResponse"));
-          apiResponseModal.show();
-          return
+            console.error("Error fetching students:", error);
         });
-      }
+        }
+
+
+        // Initialize filters and table
+        function initializeFiltersAndTable() {
+            renderGradeButtons();
+            renderGradeLabelDropdown();
+            renderStudentTable(students); // Show all students initially
+        }
+
+        // Function to render grade buttons
+        function renderGradeButtons() {
+            const gradeButtonsContainer = document.getElementById('gradeButtons');
+            const grades = [...new Set(students.map(student => student.grade))].sort();
+
+            grades.forEach(grade => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-outline-primary';
+                button.textContent = `Grade ${grade}`;
+                button.addEventListener('click', () => filterStudentsByGrade(grade));
+                gradeButtonsContainer.appendChild(button);
+            });
+        }
+
+        // Function to render grade label dropdown
+        function renderGradeLabelDropdown() {
+            const gradeLabelDropdown = document.getElementById('gradeLabelDropdown');
+            const gradeLabels = [...new Set(students.map(student => student.grade_label))].sort();
+
+            gradeLabels.forEach(label => {
+                const option = document.createElement('option');
+                option.value = label;
+                option.textContent = label;
+                gradeLabelDropdown.appendChild(option);
+            });
+
+            // Add event listener to dropdown
+            gradeLabelDropdown.addEventListener('change', (event) => {
+                filterStudentsByGradeLabel(event.target.value);
+            });
+        }
+
+        let selectedGrade = null;
+        let selectedGradeLabel = "";
+
+        // Modify the grade button filter function
+        function filterStudentsByGrade(grade) {
+            selectedGrade = grade;
+            applyFilters();
+        }
+
+        // Modify the grade label dropdown filter function
+        function filterStudentsByGradeLabel(label) {
+            selectedGradeLabel = label;
+            applyFilters();
+        }
+
+        // Apply both filters together
+        function applyFilters() {
+            let filteredStudents = students;
+
+            if (selectedGrade) {
+                filteredStudents = filteredStudents.filter(student => student.grade === selectedGrade);
+            }
+
+            if (selectedGradeLabel) {
+                filteredStudents = filteredStudents.filter(student => student.grade_label === selectedGradeLabel);
+            }
+
+            console.log(`Filtered students:`, filteredStudents);
+            renderStudentTable(filteredStudents);
+        }
+
+
+        // Function to render the student table
+        function renderStudentTable(students) {
+            const studentTable = document.getElementById('studentTable');
+            studentTable.innerHTML = ''; // Clear existing rows
+
+            students.forEach(student => {
+                studentClass = student.grade +" "+ student.grade_label;
+                const row = document.createElement('tr');
+                row.addEventListener("click", () => {
+                  window.location.href = `detailStudent.html?student_id=${student.student_id}`;
+                });
+                row.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="custom-checkbox" data-id="${student.student_id}" onclick="toggleStudentSelection(event, ${student.student_id})">
+                    </td>
+                    <td>${student.nsn}</td>
+                    <td>${student.name}</td>
+                    <td>${studentClass}</td>
+                    <td>${student.gender}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); fetchStudentDetails(${student.student_id})">Update</button>
+                    </td>
+                `;
+                studentTable.appendChild(row);
+            });
+        }
   
       // Sort helper function for class format
       function sortStudentsByClass(classA, classB) {

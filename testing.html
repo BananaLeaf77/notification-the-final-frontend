@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Filter</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Student Filter</h1>
+
+        <!-- Grade Toggle Buttons -->
+        <div class="mb-4">
+            <h4>Filter by Grade:</h4>
+            <div id="gradeButtons" class="btn-group" role="group">
+                <!-- Buttons will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Grade Label Dropdown -->
+        <div class="mb-4">
+            <h4>Filter by Grade Label:</h4>
+            <select id="gradeLabelDropdown" class="form-select">
+                <option value="">All</option>
+                <!-- Options will be dynamically added here -->
+            </select>
+        </div>
+
+        <!-- Student Table -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Grade</th>
+                    <th>Grade Label</th>
+                    <th>Gender</th>
+                    <th>Telephone</th>
+                </tr>
+            </thead>
+            <tbody id="studentTable">
+                <!-- Student rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/apiHost.js"></script>
+
+    <!-- Vanilla JS -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem("authToken");
+
+            // Check if the token exists
+            if (!token) {
+                // Show unauthorized modal and redirect to login
+                $('#unauthorizedModal').modal('show');
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 3000); // Redirect after 3 seconds
+                return;
+            }
+
+            // Fetch students if the token exists
+            fetchStudents(token);
+        });
+
+        let students = [];
+
+        function fetchStudents(token) {
+        fetch(`${apiUrl}/student/get-all`, {
+            method: "GET",
+            headers: {
+                "Authorization": token,
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                students = data.data;
+
+                // Sort students by grade and grade label
+                students.sort((a, b) => {
+                    let gradeA = parseInt(a.grade);
+                    let gradeB = parseInt(b.grade);
+
+                    if (gradeA !== gradeB) {
+                        return gradeA - gradeB; // Sort numerically first
+                    }
+
+                    let labelA = a.grade_label || ""; // Handle cases where grade_label is missing
+                    let labelB = b.grade_label || "";
+
+                    return labelA.localeCompare(labelB); // Sort alphabetically
+                });
+
+                console.log("Sorted students:", students);
+                initializeFiltersAndTable();
+            } else {
+                console.error("Failed to fetch students:", data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching students:", error);
+        });
+        }
+
+
+        // Initialize filters and table
+        function initializeFiltersAndTable() {
+            renderGradeButtons();
+            renderGradeLabelDropdown();
+            renderStudentTable(students); // Show all students initially
+        }
+
+        // Function to render grade buttons
+        function renderGradeButtons() {
+            const gradeButtonsContainer = document.getElementById('gradeButtons');
+            const grades = [...new Set(students.map(student => student.grade))].sort();
+
+            grades.forEach(grade => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-outline-primary';
+                button.textContent = `Grade ${grade}`;
+                button.addEventListener('click', () => filterStudentsByGrade(grade));
+                gradeButtonsContainer.appendChild(button);
+            });
+        }
+
+        // Function to render grade label dropdown
+        function renderGradeLabelDropdown() {
+            const gradeLabelDropdown = document.getElementById('gradeLabelDropdown');
+            const gradeLabels = [...new Set(students.map(student => student.grade_label))].sort();
+
+            gradeLabels.forEach(label => {
+                const option = document.createElement('option');
+                option.value = label;
+                option.textContent = label;
+                gradeLabelDropdown.appendChild(option);
+            });
+
+            // Add event listener to dropdown
+            gradeLabelDropdown.addEventListener('change', (event) => {
+                filterStudentsByGradeLabel(event.target.value);
+            });
+        }
+
+        let selectedGrade = null;
+        let selectedGradeLabel = "";
+
+        // Modify the grade button filter function
+        function filterStudentsByGrade(grade) {
+            selectedGrade = grade;
+            applyFilters();
+        }
+
+        // Modify the grade label dropdown filter function
+        function filterStudentsByGradeLabel(label) {
+            selectedGradeLabel = label;
+            applyFilters();
+        }
+
+        // Apply both filters together
+        function applyFilters() {
+            let filteredStudents = students;
+
+            if (selectedGrade) {
+                filteredStudents = filteredStudents.filter(student => student.grade === selectedGrade);
+            }
+
+            if (selectedGradeLabel) {
+                filteredStudents = filteredStudents.filter(student => student.grade_label === selectedGradeLabel);
+            }
+
+            console.log(`Filtered students:`, filteredStudents);
+            renderStudentTable(filteredStudents);
+        }
+
+
+        // Function to render the student table
+        function renderStudentTable(students) {
+            const studentTable = document.getElementById('studentTable');
+            studentTable.innerHTML = ''; // Clear existing rows
+
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.grade}</td>
+                    <td>${student.grade_label}</td>
+                    <td>${student.gender}</td>
+                    <td>${student.telephone}</td>
+                `;
+                studentTable.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
