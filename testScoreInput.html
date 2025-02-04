@@ -443,10 +443,11 @@
                           <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Class</th>
-                                    <th>Name</th>
-                                    <th>Latest Change By</th>
-                                    <th>Input Score</th>
+                                  <th>Class</th>
+                                  <th>NSN</th>
+                                  <th>Name</th>
+                                  <th>Latest Change By</th>
+                                  <th>Input Score</th>
                                 </tr>
                             </thead>
                             <tbody id="studentTable">
@@ -975,9 +976,9 @@
           });
       }
 
-      let students = []; // Store the fetched students globally
+    let students = []; // Store the fetched students globally
 
-function fetchTestScores(token, selectedSubjectId) {
+    function fetchTestScores(token, selectedSubjectId) {
     fetch(`${apiUrl}/user/get/test-scores/${selectedSubjectId}`, {
         method: "GET",
         headers: {
@@ -987,29 +988,33 @@ function fetchTestScores(token, selectedSubjectId) {
     })
     .then((response) => response.json())
     .then((data) => {
-        if (data.success) {
-            // Store the fetched students globally
-            students = data.data;
+        const studentTable = document.getElementById("studentTable");
+        studentTable.innerHTML = ""; // Clear table before inserting new data
+
+        if (data.success && data.data.length > 0) {
+            students = data.data; // Store the fetched students globally
 
             // Sort students by grade and grade_label
             let sortedStudents = students.sort((a, b) => {
                 if (a.student.grade !== b.student.grade) {
-                    return a.student.grade - b.student.grade; // Sort by grade
+                    return a.student.grade - b.student.grade;
                 }
-                return a.student.grade_label.localeCompare(b.student.grade_label); // Sort by grade label alphabetically
+                return a.student.grade_label.localeCompare(b.student.grade_label);
             });
 
-            // Populate the grade label dropdown
+            // Populate grade label dropdown
             populateGradeLabelDropdown(sortedStudents);
-
-            // Render the table with all students initially
             renderStudentTable(sortedStudents);
         } else {
-            console.error("Failed to fetch test scores:", data.message);
+            // Show a message if no students are available
+            studentTable.innerHTML = `<tr><td colspan="5" class="text-center">No students available for this subject.</td></tr>`;
         }
     })
-    .catch((error) => console.error("Error fetching data:", error));
+    .catch((error) => {
+        console.error("Error fetching test scores:", error);
+    });
 }
+
 
 // Function to populate the grade label dropdown
 function populateGradeLabelDropdown(students) {
@@ -1047,6 +1052,7 @@ function filterStudentsByGradeLabel(label) {
 
 // Function to render the student table
 function renderStudentTable(students) {
+  console.log("babi")
     const studentTable = document.getElementById("studentTable");
     studentTable.innerHTML = ""; // Clear previous rows
 
@@ -1058,6 +1064,7 @@ function renderStudentTable(students) {
         let row = document.createElement("tr");
         row.innerHTML = `
             <td>${student.grade} ${student.grade_label}</td>
+            <td>${student.nsn}</td>
             <td>${student.name}</td>
             <td>${user.name} (${user.role})</td>
             <td>

@@ -311,6 +311,7 @@
                       <div class="col-md-6">
                         <div class="user-profile text-center">
                           <h4 class="fw-bold mb-3">Student Information</h4>
+                          <p><b>NSN:</b> <span id="studentNSN">Loading...</span></p>
                           <p><b>Name:</b> <span id="studentName">Loading...</span></p>
                           <p><b>Grade:</b> <span id="studentGrade">Loading...</span></p>
                           <p><b>Grade Label:</b> <span id="studentGradeLabel">Loading...</span></p>
@@ -503,6 +504,7 @@
             if (data.success) {
               const student = data.data;
               // Display Student Data
+              document.getElementById("studentNSN").textContent = student.nsn;
               document.getElementById("studentName").textContent = student.name;
               document.getElementById("studentGrade").textContent = student.grade;
               document.getElementById("studentGradeLabel").textContent = student.grade_label;
