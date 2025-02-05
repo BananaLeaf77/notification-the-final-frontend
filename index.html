@@ -1214,19 +1214,22 @@
 
         // Function to render grade buttons
         function renderGradeButtons() {
-            const gradeButtonsContainer = document.getElementById('gradeButtons');
-            const grades = [...new Set(students.map(student => student.grade))].sort();
+          const gradeButtonsContainer = document.getElementById('gradeButtons');
+          
+          // Clear the container before rendering new buttons
+          gradeButtonsContainer.innerHTML = '';
 
-            grades.forEach(grade => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'btn btn-outline-primary';
-                button.textContent = `Grade ${grade}`;
-                button.addEventListener('click', () => filterStudentsByGrade(grade));
-                gradeButtonsContainer.appendChild(button);
-            });
+          const grades = [...new Set(students.map(student => student.grade))].sort((a, b) => a - b);
+
+          grades.forEach(grade => {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'btn btn-outline-primary';
+              button.textContent = `Grade ${grade}`;
+              button.addEventListener('click', () => filterStudentsByGrade(grade));
+              gradeButtonsContainer.appendChild(button);
+          });
         }
-
         // Function to render grade label dropdown
         function renderGradeLabelDropdown() {
             const gradeLabelDropdown = document.getElementById('gradeLabelDropdown');
