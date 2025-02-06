@@ -183,7 +183,7 @@
                   Are you sure you want to delete <span id="userLength"></span> Users?
               </div>
               <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-secondary" id="cancelMassDeleteButton" data-dismiss="modal">Cancel</button>
                   <button type="button" class="btn btn-danger" id="confirmMassDeleteButton">Delete</button>
               </div>
           </div>
@@ -1160,6 +1160,12 @@
         });
       });
 
+      $(document).ready(function() {
+        // Ensure both buttons trigger modal hiding
+        $('.close, .btn-secondary').on('click', function() {
+            $('#massDeleteConfirmationModal').modal('hide');
+        });
+      });
     </script>
   </body>
 </html>

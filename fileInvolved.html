@@ -561,56 +561,69 @@
       }
 
       document.getElementById('sp-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+  e.preventDefault();
 
-        const token = localStorage.getItem("authToken");
-        const fileInput = document.getElementById('exampleFormControlFile1'); // Updated ID
-        const messageElement = document.getElementById("msgs");
+  const token = localStorage.getItem("authToken");
+  const fileInput = document.getElementById('exampleFormControlFile1'); // Updated ID
+  const messageElement = document.getElementById("msgs");
 
-        if (!fileInput || !fileInput.files[0]) {
-            alert('Please select a file before submitting.');
-            return;
-        }
+  // Check if a file is selected
+  if (!fileInput || !fileInput.files[0]) {
+      alert('Please select a file before submitting.');
+      return;
+  }
 
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
+  // Get the selected file
+  const file = fileInput.files[0];
 
-        try {
-            const response = await fetch(`${apiUrl}/student-and-parent/import`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': token,
-                },
-                body: formData
-            });
+  // Check if the file is a CSV
+  if (file.type !== "text/csv" && !file.name.endsWith('.csv')) {
+      messageElement.textContent = "Only .csv files are allowed.";
+      messageElement.classList.remove("text-success");
+      messageElement.classList.add("text-danger");
+      $('#APIResponse').modal('show');
+      return; // Stop further execution
+  }
 
-            const result = await response.json();
-            if (result.success) {
-                messageElement.textContent = result.message;
-                messageElement.classList.remove("text-danger");
-                messageElement.classList.add("text-success");
-                $('#APIResponse').modal('show');
+  const formData = new FormData();
+  formData.append('file', file);
 
-            } else {
-              let errorMessage = result.message + ":";
-              if (result.error && result.error.length > 0) {
-                errorMessage += "<ul>";
-                result.error.forEach(err => {
-                  errorMessage += `<li>${err}</li>`;
-                });
-                errorMessage += "</ul>";
-              }
-              messageElement.innerHTML = errorMessage;
-              messageElement.classList.remove("text-success");
-              messageElement.classList.add("text-danger");
-              $('#APIResponse').modal('show');
-            }
-            fileInput.value = "";
-        } catch (error) {
-            console.error('Error during file upload:', error);
-            alert('An error occurred during the file upload.');
-        }
+  try {
+      const response = await fetch(`${apiUrl}/student-and-parent/import`, {
+          method: 'POST',
+          headers: {
+              'Authorization': token,
+          },
+          body: formData
       });
+
+      const result = await response.json();
+      if (result.success) {
+          messageElement.textContent = result.message;
+          messageElement.classList.remove("text-danger");
+          messageElement.classList.add("text-success");
+          $('#APIResponse').modal('show');
+
+      } else {
+        let errorMessage = result.message + ":";
+        if (result.error && result.error.length > 0) {
+          errorMessage += "<ul>";
+          result.error.forEach(err => {
+            errorMessage += `<li>${err}</li>`;
+          });
+          errorMessage += "</ul>";
+        }
+        messageElement.innerHTML = errorMessage;
+        messageElement.classList.remove("text-success");
+        messageElement.classList.add("text-danger");
+        $('#APIResponse').modal('show');
+      }
+      fileInput.value = "";
+  } catch (error) {
+      console.error('Error during file upload:', error);
+      alert('An error occurred during the file upload.');
+  }
+});
 
 
       function fetchDataChangeRequestCount(token) {
