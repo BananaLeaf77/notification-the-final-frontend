@@ -582,7 +582,13 @@
       
         // If no scores have been updated, return early
         if (studentsTestScore.length === 0) {
-          console.log("No scores to update.");
+          $('#saveChangesModal').modal('hide');
+          const messageElement = document.getElementById("msgs");
+          messageElement.innerHTML = "No changes detected.";
+          messageElement.classList.remove("text-success");
+          messageElement.classList.add("text-danger");
+          $('#APIResponse').modal('show');
+          console.log("No changes detected.");
           return;
         }
       
@@ -800,15 +806,17 @@
 
       document.getElementById("sendIt").addEventListener("click", function () {
         const token = localStorage.getItem("authToken");
-        const messageElement = document.getElementById("msgss");
+        const messageElement = document.getElementById("msgs");
     
         // Get the selected exam type
         const selectedExamType = document.querySelector('input[name="examType"]:checked');
         if (!selectedExamType) {
+            $('#sendMassModal').modal('hide');
             // Show error message if no exam type is selected
             messageElement.innerHTML = "Please select an exam type.";
             messageElement.classList.remove("text-success");
             messageElement.classList.add("text-danger");
+            $('#APIResponse').modal('show');
             return;
         }
     
