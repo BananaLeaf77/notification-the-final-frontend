@@ -496,7 +496,7 @@
 
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
-      const studentId = urlParams.get("student_id");
+      const studentId = urlParams.get("student_nsn");
 
       document.addEventListener("DOMContentLoaded", function () {
         const token = localStorage.getItem("authToken");
@@ -532,7 +532,7 @@
             if (data.success) {
               const student = data.data;
               // Display Student Data
-              document.getElementById("studentNSN").textContent = student.nsn;
+              document.getElementById("studentNSN").textContent = student.student_nsn;
               document.getElementById("studentName").textContent = student.name;
               document.getElementById("studentGrade").textContent = student.grade;
               document.getElementById("studentGradeLabel").textContent = student.grade_label;

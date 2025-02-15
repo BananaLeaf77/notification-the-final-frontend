@@ -79,7 +79,7 @@
                 </div>
                 <div class="form-group">
                   <label for="modalStudentGradeLabel">Grade Label <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" id="modalStudentGradeLabel" placeholder="A,B,C,D...">
+                  <input type="text" class="form-control" id="modalStudentGradeLabel" placeholder="A,B,C,D..." maxlength="5">
                 </div>
                 <div class="form-group">
                   <label for="modalStudentGender">Gender <span class="text-danger">*</span></label><br>
@@ -985,7 +985,7 @@
                 "Authorization": token,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ student_ids: selectedStudentIds }),
+            body: JSON.stringify({ student_nsns: selectedStudentIds }),
         })
             .then(response => response.json())
             .then(data => {
@@ -1286,21 +1286,21 @@
             studentTable.innerHTML = ''; // Clear existing rows
 
             students.forEach(student => {
-                studentClass = student.grade +" "+ student.grade_label;
+                studentClass = student.grade + " " + student.grade_label;
                 const row = document.createElement('tr');
                 row.addEventListener("click", () => {
-                  window.location.href = `detailStudent.html?student_id=${student.student_id}`;
+                    window.location.href = `detailStudent.html?student_nsn=${student.student_nsn}`; // Ensure this is a string
                 });
                 row.innerHTML = `
                     <td>
-                        <input type="checkbox" class="custom-checkbox" data-id="${student.student_id}" onclick="toggleStudentSelection(event, ${student.student_id})">
+                        <input type="checkbox" class="custom-checkbox" data-id="${student.student_nsn}" onclick="toggleStudentSelection(event, '${student.student_nsn}')">
                     </td>
-                    <td>${student.nsn}</td>
+                    <td>${student.student_nsn}</td>
                     <td>${student.name}</td>
                     <td>${studentClass}</td>
                     <td>${student.gender}</td>
                     <td>
-                        <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); fetchStudentDetails(${student.student_id})">Update</button>
+                        <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); fetchStudentDetails('${student.student_nsn}')">Update</button>
                     </td>
                 `;
                 studentTable.appendChild(row);
@@ -1332,30 +1332,6 @@
       function getSelectedIdsJson() {
           return JSON.stringify({ ids: selectedStudentIds });
       }
-
-      function createStudentRow(student) {
-        const row = document.createElement('tr');
-        row.classList.add('student-row');
-    
-        // Add onclick event to navigate to detailStudent.html
-        row.addEventListener("click", () => {
-            window.location.href = `detailStudent.html?student_id=${student.student_id}`;
-        });
-    
-        row.innerHTML = `
-            <td>
-                <input type="checkbox" class="custom-checkbox" data-id="${student.student_id}" onclick="toggleStudentSelection(event, ${student.student_id})">
-            </td>
-            <td>${student.nsn}</td>
-            <td>${student.name}</td>
-            <td>${student.class}</td>
-            <td>${student.gender}</td>
-            <td>
-                <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); fetchStudentDetails(${student.student_id})">Update</button>
-            </td>
-        `;
-        return row;
-    }
 
     document.getElementById("saveChanges").addEventListener("click", function () {
       const token = localStorage.getItem("authToken");
@@ -1396,18 +1372,18 @@
       // Prepare the payload to send
       const payload = {
           student: {
-            nsn: studentNSN,
+            student_nsn: studentNSN,
             name: studentName,
             grade: parseInt(studentGrade, 10),
-              grade_label: studentGradeLabel,
-              gender: studentGender,
-              telephone: studentTelephone
+            grade_label: studentGradeLabel,
+            gender: studentGender,
+            telephone: studentTelephone
           },
           parent: {
-              name: parentName,
-              gender: parentGender,
-              telephone: parentTelephone,
-              email: parentEmail
+            name: parentName,
+            gender: parentGender,
+            telephone: parentTelephone,
+            email: parentEmail
           }
       };
   
@@ -1458,9 +1434,9 @@
           });
     });
     
-    function fetchStudentDetails(studentId) {
+    function fetchStudentDetails(studentNSN) {
       const token = localStorage.getItem("authToken");
-      const url = `${apiUrl}/student-and-parent/student/${studentId}`;
+      const url = `${apiUrl}/student-and-parent/student/${studentNSN}`;
   
       fetch(url, {
           method: "GET",
@@ -1475,12 +1451,12 @@
               const student = data.data;
               const parent = student.parent;
   
-              // Set student_id in the student name input field
+              // Set student_nsn in the student name input field
               const studentNameInput = document.getElementById("modalStudentName");
               const studentNSNInput = document.getElementById("modalStudentNSN");
-              studentNSNInput.value = student.nsn;
+              studentNSNInput.value = student.student_nsn;
               studentNameInput.value = student.name;
-              studentNameInput.setAttribute("data-student-id", student.student_id); // Set student_id here
+              studentNameInput.setAttribute("data-student-id", student.student_nsn); // Set student_nsn here
   
               // Populate other student data in the input fields
               document.getElementById("modalStudentGrade").value = student.grade;
@@ -1579,7 +1555,7 @@
         
         // Set the student ID on the "Delete" button
         const confirmDeleteButton = document.getElementById("confirmDeleteButton");
-        confirmDeleteButton.setAttribute("data-student-id", studentId);
+        confirmDeleteButton.setAttribute("data-student-id", studnetNSN);
         
         // Show the modal
         $('#deleteConfirmationModal').modal('show');

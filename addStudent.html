@@ -348,7 +348,7 @@
                           </div>
                           <div class="form-group">
                               <label for="studentGradeLabel">Grade Label <span class="text-danger">*</span></label>
-                              <input type="text" class="form-control" id="studentGradeLabel" placeholder="A,B,C,D..." maxlength="3" required />
+                              <input type="text" class="form-control" id="studentGradeLabel" placeholder="A,B,C,D..." maxlength="5" required />
                           </div>
                           <div class="form-group">
                               <label for="studentTelephone">Telephone <span class="text-danger">*</span></label>
@@ -560,7 +560,7 @@
       
         const data = {
           student: {
-            nsn: document.getElementById('studentNSN').value,
+            student_nsn: document.getElementById('studentNSN').value,
             name: document.getElementById('studentName').value,
             grade: parseInt(document.getElementById('studentGrade').value, 10),
             grade_label: document.getElementById('studentGradeLabel').value,
