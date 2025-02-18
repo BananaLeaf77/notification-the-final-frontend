@@ -851,14 +851,14 @@
     
         // Get all selected subject IDs
         const selectedSubjects = Array.from(subjectTable.querySelectorAll("input[type='checkbox']:checked"))
-          .map(input => parseInt(input.value));
+          .map(input => input.value);
     
         // Construct payload
         const payload = {
           user: {},
-          subject_ids: selectedSubjects
+          subject_codes: selectedSubjects
         };
-    
+
         // Add username and password to the payload only if they're updated
         if (username) payload.user.username = username;
         if (name) payload.user.name = name;
@@ -949,24 +949,24 @@
                 .then(subjectData => {
                     if (subjectData.success) {
                         const allSubjects = subjectData.data;
-                        const assignedSubjects = userData.teaching.map(subject => subject.subject_id);
+                        const assignedSubjects = userData.teaching.map(subject => subject.subject_code);
     
                         // Clear any existing checkboxes
                         subjectTable.innerHTML = "";
     
                         // Populate subject checkboxes
                         allSubjects.forEach(subject => {
-                            const isChecked = assignedSubjects.includes(subject.subject_id) ? "checked" : "";
+                            const isChecked = assignedSubjects.includes(subject.subject_code) ? "checked" : "";
     
                             const subjectCheckbox = `
                                 <div class="form-check">
                                     <input 
                                         class="form-check-input" 
                                         type="checkbox" 
-                                        id="subject-${subject.subject_id}" 
-                                        value="${subject.subject_id}" 
+                                        id="subject-${subject.subject_code}" 
+                                        value="${subject.subject_code}" 
                                         ${isChecked}>
-                                    <label class="form-check-label" for="subject-${subject.subject_id}">
+                                    <label class="form-check-label" for="subject-${subject.subject_code}">
                                         ${subject.name} (Grade ${subject.grade})
                                     </label>
                                 </div>

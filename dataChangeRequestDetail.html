@@ -325,7 +325,7 @@
         <div class="container">
           <div class="page-inner">
             <div class="page-header mb-4">
-              <h3 class="fw-bold">Data Change Request Detail</h3>
+              <h3 class="fw-bold">Parent Data Change Request Detail</h3>
             </div>
         
             <div class="row">
@@ -633,7 +633,7 @@
               $('#APIResponse').modal('show');
               setTimeout(() => {
                 window.location.href = "dataChangeRequest.html";
-              }, 3000);
+              }, 5000);
             }else{
               messageElement.innerHTML = data.message+", "+data.error;
               messageElement.classList.remove("text-success");

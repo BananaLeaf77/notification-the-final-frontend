@@ -67,7 +67,7 @@
                 <div class="form-group">
                   <label for="modalStudentNSN">NSN (National Student Number) <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" id="modalStudentNSN" maxlength="10" placeholder="Enter Student NSN" 
-                          oninput="validateNSN(this)" pattern="\d{10}" required>
+                          oninput="validateNSN(this)" pattern="\d{10}" required disabled>
                 </div>
                 <div class="form-group">
                   <label for="modalStudentName">Student Name <span class="text-danger">*</span></label>
@@ -827,8 +827,8 @@
     
         // Prepare the payload
         const payload = {
-            ids: selectedStudentIds,
-            subject_id: parseInt(selectedSubjectId, 10),
+            nsn_list: selectedStudentIds,
+            subject_code: `${selectedSubjectId}`,
         };
     
         // Make the API request
@@ -933,7 +933,7 @@
                     sortedSubjects.forEach(subject => {
                         const subjectCard = document.createElement("div");
                         subjectCard.classList.add("subject-card", "text-center", "p-3", "border", "rounded");
-                        subjectCard.setAttribute("data-subject-id", subject.subject_id);
+                        subjectCard.setAttribute("data-subject-id", subject.subject_code);
 
                         subjectCard.innerHTML = `
                             <div class="subject-grade">Grade ${subject.grade}</div>
@@ -1204,7 +1204,6 @@
         });
         }
 
-
         // Initialize filters and table
         function initializeFiltersAndTable() {
             renderGradeButtons();
@@ -1232,20 +1231,24 @@
         }
         // Function to render grade label dropdown
         function renderGradeLabelDropdown() {
-            const gradeLabelDropdown = document.getElementById('gradeLabelDropdown');
-            const gradeLabels = [...new Set(students.map(student => student.grade_label))].sort();
+          const gradeLabelDropdown = document.getElementById('gradeLabelDropdown');
+          
+          // Clear the dropdown before rendering new options
+          gradeLabelDropdown.innerHTML = '<option value="">All</option>';
 
-            gradeLabels.forEach(label => {
-                const option = document.createElement('option');
-                option.value = label;
-                option.textContent = label;
-                gradeLabelDropdown.appendChild(option);
-            });
+          const gradeLabels = [...new Set(students.map(student => student.grade_label))].sort();
 
-            // Add event listener to dropdown
-            gradeLabelDropdown.addEventListener('change', (event) => {
-                filterStudentsByGradeLabel(event.target.value);
-            });
+          gradeLabels.forEach(label => {
+              const option = document.createElement('option');
+              option.value = label;
+              option.textContent = label;
+              gradeLabelDropdown.appendChild(option);
+          });
+
+          // Add event listener to dropdown
+          gradeLabelDropdown.addEventListener('change', (event) => {
+              filterStudentsByGradeLabel(event.target.value);
+          });
         }
 
         let selectedGrade = null;

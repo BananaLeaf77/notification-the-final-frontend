@@ -62,6 +62,50 @@
           </div>
       </div>
     </div>
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmationModalLabel">Confirm Submission</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Please review the data before submitting:</p>
+            <div class="row">
+              <!-- Student Information (Left Side) -->
+              <div class="col-md-6">
+                <h5><b>Student Information</b></h5>
+                <ul class="list-unstyled">
+                  <li><strong>NSN:</strong> <span id="confirmStudentNSN"></span></li>
+                  <li><strong>Name:</strong> <span id="confirmStudentName"></span></li>
+                  <li><strong>Grade:</strong> <span id="confirmStudentGrade"></span></li>
+                  <li><strong>Grade Label:</strong> <span id="confirmStudentGradeLabel"></span></li>
+                  <li><strong>Telephone:</strong> <span id="confirmStudentTelephone"></span></li>
+                  <li><strong>Gender:</strong> <span id="confirmStudentGender"></span></li>
+                </ul>
+              </div>
+    
+              <!-- Parent Data (Right Side) -->
+              <div class="col-md-6">
+                <h5><b>Parent Data</b></h5>
+                <ul class="list-unstyled">
+                  <li><strong>Name:</strong> <span id="confirmParentName"></span></li>
+                  <li><strong>Telephone:</strong> <span id="confirmParentTelephone"></span></li>
+                  <li><strong>Email:</strong> <span id="confirmParentEmail"></span></li>
+                  <li><strong>Gender:</strong> <span id="confirmParentGender"></span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="confirmSubmitButton">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Unauthorized -->
     <div class="modal fade" id="unauthorizedModal" tabindex="-1" aria-labelledby="unauthorizedModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -552,12 +596,44 @@
         $('#logoutConfirmationModal').modal('show');
       }
 
+      
+      document.getElementById('student-parent-form').addEventListener('submit', (e) => {
+        e.preventDefault(); // Prevent the form from submitting immediately
 
-      
-      document.getElementById('student-parent-form').addEventListener('submit', async (e) => {
+        // Get the form data
+        const studentNSN = document.getElementById('studentNSN').value;
+        const studentName = document.getElementById('studentName').value;
+        const studentGrade = document.getElementById('studentGrade').value;
+        const studentGradeLabel = document.getElementById('studentGradeLabel').value;
+        const studentTelephone = document.getElementById('studentTelephone').value;
+        const studentGender = document.querySelector('input[name="studentGender"]:checked').value;
+
+        const parentName = document.getElementById('parentName').value;
+        const parentTelephone = document.getElementById('parentTelephone').value;
+        const parentEmail = document.getElementById('parentEmail').value || 'N/A'; 
+        const parentGender = document.querySelector('input[name="parentGender"]:checked').value;
+
+        // Populate the confirmation modal with the form data
+        document.getElementById('confirmStudentNSN').textContent = studentNSN;
+        document.getElementById('confirmStudentName').textContent = studentName;
+        document.getElementById('confirmStudentGrade').textContent = studentGrade;
+        document.getElementById('confirmStudentGradeLabel').textContent = studentGradeLabel;
+        document.getElementById('confirmStudentTelephone').textContent = studentTelephone;
+        document.getElementById('confirmStudentGender').textContent = studentGender;
+
+        document.getElementById('confirmParentName').textContent = parentName;
+        document.getElementById('confirmParentTelephone').textContent = parentTelephone;
+        document.getElementById('confirmParentEmail').textContent = parentEmail;
+        document.getElementById('confirmParentGender').textContent = parentGender;
+
+        // Show the confirmation modal
+        $('#confirmationModal').modal('show');
+      });
+
+      document.getElementById('confirmSubmitButton').addEventListener('click', async () => {
         const token = localStorage.getItem("authToken");
-        e.preventDefault();
-      
+
+        // Prepare the data
         const data = {
           student: {
             student_nsn: document.getElementById('studentNSN').value,
@@ -574,8 +650,7 @@
             gender: document.querySelector('input[name="parentGender"]:checked').value,
           },
         };
-      
-        console.log(JSON.stringify(data));
+
         try {
           const response = await fetch(`${apiUrl}/student-and-parent/insert`, {
             method: 'POST',
@@ -585,16 +660,16 @@
             },
             body: JSON.stringify(data),
           });
-      
+
           const responseData = await response.json();
           const messageElement = document.getElementById("msgs");
-      
+
           if (responseData.success) {
             // Success message and form reset
             messageElement.textContent = responseData.message;
             messageElement.classList.remove("text-danger");
             messageElement.classList.add("text-success");
-      
+
             // Reset form fields
             document.getElementById('student-parent-form').reset();
           } else {
@@ -611,28 +686,31 @@
             messageElement.classList.remove("text-success");
             messageElement.classList.add("text-danger");
           }
-      
+
           // Show the modal with the response message
           $('#APIResponse').modal('show');
         } catch (error) {
-          console.log("masuk catch")
-          
+          console.log("Error occurred:", error);
+
           const messageElement = document.getElementById("msgs");
-          messageElement.textContent = "Error Occured";
+          messageElement.textContent = "Error Occurred";
           messageElement.classList.remove("text-success");
           messageElement.classList.add("text-danger");
-      
+
           // Show the modal
           $('#APIResponse').modal('show');
         }
-      
-        // Event listener to close the modal when "Ok" button is clicked
-        document.getElementById("confirmAPIResponse").addEventListener("click", function() {
-          $('#APIResponse').modal('hide');
-        });
+
+        // Hide the confirmation modal
+        $('#confirmationModal').modal('hide');
       });
       
-
+$(document).ready(function() {
+  // Ensure the confirmation modal can be closed
+  $('#confirmationModal .close, #confirmationModal .btn-secondary').on('click', function() {
+    $('#confirmationModal').modal('hide');
+  });
+});
       // Event listener for confirming logout
       document.getElementById("confirmLogoutButton").addEventListener("click", function () {
           // Remove the token from local storage
@@ -761,7 +839,13 @@
             $('#APIResponse').modal('hide');
         });
       });
-
+      
+      $(document).ready(function() {
+        // Ensure the confirmation modal can be closed
+        $('#confirmationModal .close, #confirmationModal .btn-secondary').on('click', function() {
+          $('#confirmationModal').modal('hide');
+        });
+      });
     </script>
   </body>
 </html>

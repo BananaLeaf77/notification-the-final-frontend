@@ -55,7 +55,7 @@
                   </button>
               </div>
               <div class="modal-body">
-                  Are you sure you want to delete data change request "<span id="dcrTelephone"></span>"?
+                  Are you sure you want to delete parent data change request "<span id="dcrTelephone"></span>"?
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -420,7 +420,7 @@
               class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4"
             >
               <div>
-                <h3 class="fw-bold mb-3">Data Change Request</h3>
+                <h3 class="fw-bold mb-3">Parent Data Change Request</h3>
               </div>
               
             </div>
@@ -429,7 +429,7 @@
                 <div class="card card-round">
                   <div class="card-header">
                     <p class="card-category">
-                      Data change request for students and parents data.
+                      Parent data change request list.
                     </p>
                   </div>
                   <div class="card-body">
@@ -654,7 +654,7 @@
                         tableBody.appendChild(row);
                     });
                 } else {
-                    console.error("Error fetching data change requests:", data.message);
+                    console.error("Error fetching parent data change requests:", data.message);
                     tableBody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">No data available</td></tr>`;
                 }
             })

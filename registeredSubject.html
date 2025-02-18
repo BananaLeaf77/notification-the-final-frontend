@@ -58,7 +58,7 @@
               <div class="modal-body">
                   <div class="form-group">
                     <label for="modalSubjectCode">Subject Code <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="modalSubjectCode" placeholder="xxxxx" maxlength="5">
+                    <input type="text" class="form-control" id="modalSubjectCode" placeholder="xxxxx" maxlength="5" disabled>
                   </div>
                   <!-- Username Field -->
                   <div class="form-group">
@@ -760,11 +760,11 @@
                           <td>${subject.grade}</td>
                           <td>${subject.name}</td>
                           <td>
-                            <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); runSubjectUpdateModal(${subject.subject_id})">Update</button>
+                            <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); runSubjectUpdateModal('${subject.subject_code}')">Update</button>
                           </td>
                       `;
 
-                      // <button class="btn btn-danger btn-sm delete-btn" onclick="event.stopPropagation(); showDeleteModal(${subject.subject_id}, '${subject.name}')">Delete</button>
+                      // <button class="btn btn-danger btn-sm delete-btn" onclick="event.stopPropagation(); showDeleteModal(${subject.subject_code}, '${subject.name}')">Delete</button>
                       // Add checkbox event listener for user selection
                       subjectTable.appendChild(row);
                   });
@@ -821,15 +821,15 @@
             .catch((error) => console.error("Error fetching user details:", error));
     });
     
-    function runSubjectUpdateModal(subjectId) {
+    function runSubjectUpdateModal(subjectCode) {
+        console.log("Subject code:", subjectCode);
         const token = localStorage.getItem("authToken");
         const messageElement = document.getElementById("msgs");
         const modalSubjectCode = document.getElementById("modalSubjectCode");
         const modalSubjectName = document.getElementById("modalSubjectName");
         const modalSubjectGrade = document.getElementById("modalSubjectGrade");
-    
         // Fetch user details
-        fetch(`${apiUrl}/user/subject/${subjectId}`, {
+        fetch(`${apiUrl}/user/subject/${subjectCode}`, {
             method: "GET",
             headers: {
                 "Authorization": `${token}`,
@@ -844,7 +844,7 @@
                     modalSubjectName.value = subjectData.name;
                     modalSubjectGrade.value = subjectData.grade;
     
-                    modalSubjectName.setAttribute("data-subject-id", subjectData.subject_id);
+                    modalSubjectName.setAttribute("data-subject-id", `${subjectData.subject_code}`);
                 } else {
                     messageElement.innerHTML = data.error || "Failed to fetch user details.";
                     messageElement.classList.remove("text-success");
