@@ -313,16 +313,20 @@
                   </ul>
                 </li>            
                 <li class="nav-item topbar-icon dropdown hidden-caret">
+                  <a
+                    class="nav-link dropdown-toggle"
+                    href="dataChangeRequest.html"
+                    id="notifDropdown"
+                    role="button"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <i class="fa fa-bell"></i>
+                    <span class="notification text-dark" id="dataChangeRequestCount">0</span>                  </a>
                   <ul
                     class="dropdown-menu notif-box animated fadeIn"
                     aria-labelledby="notifDropdown"
                   >
-                    <li>
-                      <div class="notif-scroll scrollbar-outer">
-                        <div class="notif-center">                          
-                        </div>
-                      </div>
-                    </li>                    
                   </ul>
                 </li>              
                 <li class="nav-item topbar-user dropdown hidden-caret">
@@ -401,6 +405,11 @@
                         <div>
                           <a class="btn btn-success btn-round" id="saveChangesBtn">
                             <i class="fas fa-save"></i> Save Changes
+                          </a>
+                        </div>
+                        <div class="timeline-badge">
+                          <a href="#" class="btn btn-primary btn-round" onclick="showSendMassExamInfo()">
+                            <i class="far fa-paper-plane"></i> Send
                           </a>
                         </div>
                       </div>
@@ -803,7 +812,8 @@
     
         // Show the loading spinner modal before sending the request
         $('#sendMassModal').modal('hide');
-        loadingModal.show();
+        $('#loadingModal').modal('show');
+        
     
         // Send the notification
         fetch(`${apiUrl}/sender/send-mass/exam-result`, {
@@ -817,8 +827,8 @@
         .then(response => response.json())
         .then(data => {
             // Hide the loading spinner modal after receiving a response
-            loadingModal.hide();
-    
+            $('#loadingModal').modal('hide');
+            console.log(data);
             if (data.success) {
                 messageElement.innerHTML = data.message;
                 messageElement.classList.remove("text-danger");
@@ -831,10 +841,9 @@
     
             // Hide the send mass modal
             $('#sendMassModal').modal('hide');
+            
+            $('#APIResponse').modal('show');
         
-            // Show the response modal
-            const apiResponseModal = new bootstrap.Modal(document.getElementById("APIResponseRefresh"));
-            apiResponseModal.show();
         })
         .catch(error => {
             console.error("Error sending notification:", error);
