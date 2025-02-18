@@ -67,7 +67,7 @@
                 <div class="form-group">
                   <label for="modalStudentNSN">NSN (National Student Number) <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" id="modalStudentNSN" maxlength="10" placeholder="Enter Student NSN" 
-                          oninput="validateNSN(this)" pattern="\d{10}" required>
+                          oninput="validateNSN(this)" pattern="\d{10}" required disabled>
                 </div>
                 <div class="form-group">
                   <label for="modalStudentName">Student Name <span class="text-danger">*</span></label>
@@ -79,7 +79,7 @@
                 </div>
                 <div class="form-group">
                   <label for="modalStudentGradeLabel">Grade Label <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" id="modalStudentGradeLabel" placeholder="A,B,C,D...">
+                  <input type="text" class="form-control" id="modalStudentGradeLabel" placeholder="A,B,C,D..." maxlength="5">
                 </div>
                 <div class="form-group">
                   <label for="modalStudentGender">Gender <span class="text-danger">*</span></label><br>
@@ -276,7 +276,6 @@
       </div>
     </div>
 
-
     <div class="wrapper">
       <!-- Sidebar -->
       <div class="sidebar" data-background-color="light">
@@ -379,28 +378,6 @@
               </nav>
 
               <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
-                <li
-                  class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none"
-                >
-                  <a
-                    href="dataChangeRequest.html"
-                    role="button"
-                  >
-                    <i class="fa fa-search"></i>
-                  </a>
-                  <ul class="dropdown-menu dropdown-search animated fadeIn">
-                    <form class="navbar-left navbar-form nav-search">
-                      <div class="input-group">
-                        <input
-                          type="text"
-                          placeholder="Search ..."
-                          class="form-control"
-                        />
-                      </div>
-                    </form>
-                  </ul>
-                </li>            
-                           
                 <li class="nav-item topbar-user dropdown hidden-caret">
                   <a
                     class="dropdown-toggle profile-pic"
@@ -439,7 +416,6 @@
                               >View Profile</a
                             >
                           </div>
-                          
                         </div>
                       </li>
                       <li>
@@ -479,7 +455,7 @@
                       </div>
                       <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
-                          <p class="card-category">Assigned Subject</p>
+                          <p class="card-category">Registered Subject</p>
                           <h4 class="card-title" id="daftarMapel">Loading...</h4>
                         </div>
                       </div>
@@ -516,11 +492,6 @@
                     <div class="card-head-row card-tools-still-right">
                       <h4 class="card-title">Student List</h4>
                       <div class="card-tools d-flex justify-content-between align-items-center">
-                        <div>
-                          <a href="addStudent.html" class="btn btn-success btn-round">
-                            <i class="fas fa-user-plus"></i> Add
-                          </a>
-                        </div>
                         <div class="timeline-badge">
                           <a href="#" class="btn btn-primary btn-round" onclick="showSendMassInfo()">
                             <i class="far fa-paper-plane"></i> Send
@@ -552,6 +523,7 @@
                                     <th>Name</th>
                                     <th>Class</th>
                                     <th>Gender</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="studentTable">
@@ -775,8 +747,8 @@
     
         // Prepare the payload
         const payload = {
-            ids: selectedStudentIds,
-            subject_id: parseInt(selectedSubjectId, 10),
+            nsn_list: selectedStudentIds,
+            subject_code: `${selectedSubjectId}`,
         };
     
         // Make the API request
@@ -881,7 +853,7 @@
                     sortedSubjects.forEach(subject => {
                         const subjectCard = document.createElement("div");
                         subjectCard.classList.add("subject-card", "text-center", "p-3", "border", "rounded");
-                        subjectCard.setAttribute("data-subject-id", subject.subject_id);
+                        subjectCard.setAttribute("data-subject-id", subject.subject_code);
 
                         subjectCard.innerHTML = `
                             <div class="subject-grade">Grade ${subject.grade}</div>
@@ -933,7 +905,7 @@
                 "Authorization": token,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ student_ids: selectedStudentIds }),
+            body: JSON.stringify({ student_nsns: selectedStudentIds }),
         })
             .then(response => response.json())
             .then(data => {
@@ -1152,7 +1124,6 @@
         });
         }
 
-
         // Initialize filters and table
         function initializeFiltersAndTable() {
             renderGradeButtons();
@@ -1178,23 +1149,26 @@
               gradeButtonsContainer.appendChild(button);
           });
         }
-
         // Function to render grade label dropdown
         function renderGradeLabelDropdown() {
-            const gradeLabelDropdown = document.getElementById('gradeLabelDropdown');
-            const gradeLabels = [...new Set(students.map(student => student.grade_label))].sort();
+          const gradeLabelDropdown = document.getElementById('gradeLabelDropdown');
+          
+          // Clear the dropdown before rendering new options
+          gradeLabelDropdown.innerHTML = '<option value="">All</option>';
 
-            gradeLabels.forEach(label => {
-                const option = document.createElement('option');
-                option.value = label;
-                option.textContent = label;
-                gradeLabelDropdown.appendChild(option);
-            });
+          const gradeLabels = [...new Set(students.map(student => student.grade_label))].sort();
 
-            // Add event listener to dropdown
-            gradeLabelDropdown.addEventListener('change', (event) => {
-                filterStudentsByGradeLabel(event.target.value);
-            });
+          gradeLabels.forEach(label => {
+              const option = document.createElement('option');
+              option.value = label;
+              option.textContent = label;
+              gradeLabelDropdown.appendChild(option);
+          });
+
+          // Add event listener to dropdown
+          gradeLabelDropdown.addEventListener('change', (event) => {
+              filterStudentsByGradeLabel(event.target.value);
+          });
         }
 
         let selectedGrade = null;
@@ -1235,19 +1209,22 @@
             studentTable.innerHTML = ''; // Clear existing rows
 
             students.forEach(student => {
-                studentClass = student.grade +" "+ student.grade_label;
+                studentClass = student.grade + " " + student.grade_label;
                 const row = document.createElement('tr');
                 row.addEventListener("click", () => {
-                  window.location.href = `staffDetailStudent.html?student_id=${student.student_id}`;
+                    window.location.href = `detailStudent.html?student_nsn=${student.student_nsn}`; // Ensure this is a string
                 });
                 row.innerHTML = `
                     <td>
-                        <input type="checkbox" class="custom-checkbox" data-id="${student.student_id}" onclick="toggleStudentSelection(event, ${student.student_id})">
+                        <input type="checkbox" class="custom-checkbox" data-id="${student.student_nsn}" onclick="toggleStudentSelection(event, '${student.student_nsn}')">
                     </td>
-                    <td>${student.nsn}</td>
+                    <td>${student.student_nsn}</td>
                     <td>${student.name}</td>
                     <td>${studentClass}</td>
                     <td>${student.gender}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); fetchStudentDetails('${student.student_nsn}')">Update</button>
+                    </td>
                 `;
                 studentTable.appendChild(row);
             });
@@ -1278,30 +1255,6 @@
       function getSelectedIdsJson() {
           return JSON.stringify({ ids: selectedStudentIds });
       }
-
-      function createStudentRow(student) {
-        const row = document.createElement('tr');
-        row.classList.add('student-row');
-    
-        // Add onclick event to navigate to detailStudent.html
-        row.addEventListener("click", () => {
-            window.location.href = `detailStudent.html?student_id=${student.student_id}`;
-        });
-    
-        row.innerHTML = `
-            <td>
-                <input type="checkbox" class="custom-checkbox" data-id="${student.student_id}" onclick="toggleStudentSelection(event, ${student.student_id})">
-            </td>
-            <td>${student.nsn}</td>
-            <td>${student.name}</td>
-            <td>${student.class}</td>
-            <td>${student.gender}</td>
-            <td>
-                <button class="btn btn-warning btn-sm update-btn" onclick="event.stopPropagation(); fetchStudentDetails(${student.student_id})">Update</button>
-            </td>
-        `;
-        return row;
-    }
 
     document.getElementById("saveChanges").addEventListener("click", function () {
       const token = localStorage.getItem("authToken");
@@ -1342,18 +1295,18 @@
       // Prepare the payload to send
       const payload = {
           student: {
-            nsn: studentNSN,
+            student_nsn: studentNSN,
             name: studentName,
             grade: parseInt(studentGrade, 10),
-              grade_label: studentGradeLabel,
-              gender: studentGender,
-              telephone: studentTelephone
+            grade_label: studentGradeLabel,
+            gender: studentGender,
+            telephone: studentTelephone
           },
           parent: {
-              name: parentName,
-              gender: parentGender,
-              telephone: parentTelephone,
-              email: parentEmail
+            name: parentName,
+            gender: parentGender,
+            telephone: parentTelephone,
+            email: parentEmail
           }
       };
   
@@ -1404,9 +1357,9 @@
           });
     });
     
-    function fetchStudentDetails(studentId) {
+    function fetchStudentDetails(studentNSN) {
       const token = localStorage.getItem("authToken");
-      const url = `${apiUrl}/student-and-parent/student/${studentId}`;
+      const url = `${apiUrl}/student-and-parent/student/${studentNSN}`;
   
       fetch(url, {
           method: "GET",
@@ -1421,12 +1374,12 @@
               const student = data.data;
               const parent = student.parent;
   
-              // Set student_id in the student name input field
+              // Set student_nsn in the student name input field
               const studentNameInput = document.getElementById("modalStudentName");
               const studentNSNInput = document.getElementById("modalStudentNSN");
-              studentNSNInput.value = student.nsn;
+              studentNSNInput.value = student.student_nsn;
               studentNameInput.value = student.name;
-              studentNameInput.setAttribute("data-student-id", student.student_id); // Set student_id here
+              studentNameInput.setAttribute("data-student-id", student.student_nsn); // Set student_nsn here
   
               // Populate other student data in the input fields
               document.getElementById("modalStudentGrade").value = student.grade;
@@ -1525,7 +1478,7 @@
         
         // Set the student ID on the "Delete" button
         const confirmDeleteButton = document.getElementById("confirmDeleteButton");
-        confirmDeleteButton.setAttribute("data-student-id", studentId);
+        confirmDeleteButton.setAttribute("data-student-id", studnetNSN);
         
         // Show the modal
         $('#deleteConfirmationModal').modal('show');
@@ -1627,6 +1580,7 @@
       $(document).ready(function() {
         // Ensure both buttons trigger modal hiding
         $('.close, .btn-secondary').on('click', function() {
+            selectedSubjectId = null;
             $('#sendMassModal').modal('hide');
         });
       });

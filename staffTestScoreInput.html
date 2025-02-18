@@ -312,7 +312,29 @@
                     </form>
                   </ul>
                 </li>            
-                         
+                <li class="nav-item topbar-icon dropdown hidden-caret">
+                  <a
+                    class="nav-link dropdown-toggle"
+                    href="dataChangeRequest.html"
+                    id="notifDropdown"
+                    role="button"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <i class="fa fa-bell"></i>
+                    <span class="notification text-dark" id="dataChangeRequestCount">0</span>                  </a>
+                  <ul
+                    class="dropdown-menu notif-box animated fadeIn"
+                    aria-labelledby="notifDropdown"
+                  >
+                    <li>
+                      <div class="notif-scroll scrollbar-outer">
+                        <div class="notif-center">                          
+                        </div>
+                      </div>
+                    </li>                    
+                  </ul>
+                </li>              
                 <li class="nav-item topbar-user dropdown hidden-caret">
                   <a
                     class="dropdown-toggle profile-pic"
@@ -345,11 +367,7 @@
                           <div class="u-text">
                             <h4 id="clickedProfileName">Loading...</h4>
                             <p class="text-muted" id="clickedProfileRole">Loading...</p>
-                            <a
-                              href="staffDetailProfile.html"
-                              class="btn btn-xs btn-secondary btn-sm"
-                              >View Profile</a
-                            >
+                            
                           </div>
                         </div>
                       </li>
@@ -408,11 +426,11 @@
                           <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Class</th>
-                                    <th>NSN</th>
-                                    <th>Name</th>
-                                    <th>Latest Change By</th>
-                                    <th>Input Score</th>
+                                  <th>Class</th>
+                                  <th>NSN</th>
+                                  <th>Name</th>
+                                  <th>Latest Change By</th>
+                                  <th>Input Score</th>
                                 </tr>
                             </thead>
                             <tbody id="studentTable">
@@ -524,21 +542,19 @@
         // Show the confirmation modal
         $('#logoutConfirmationModal').modal('show');
       }
-
-
       
       function saveTestScores(token, subjectId) {
         const scoreInputs = document.querySelectorAll(".score-input");
       
         const studentsTestScore = Array.from(scoreInputs)
           .map((input) => {
-            const studentId = parseInt(input.getAttribute("data-student-id"), 10);
+            const studentId = input.getAttribute("data-student-id");
             const newScore = parseFloat(input.value);
             const originalScore = parseFloat(input.getAttribute("data-original-score"));
       
             // Only include students with modified scores (different from the original)
             if (!isNaN(newScore) && newScore !== originalScore) {
-              return { student_id: studentId, test_score: newScore };
+              return { student_nsn: studentId, test_score: newScore };
             }
       
             return null;
@@ -547,15 +563,20 @@
       
         // If no scores have been updated, return early
         if (studentsTestScore.length === 0) {
-          console.log("No scores to update.");
+          $('#saveChangesModal').modal('hide');
+          const messageElement = document.getElementById("msgs");
+          messageElement.innerHTML = "No changes detected.";
+          messageElement.classList.remove("text-success");
+          messageElement.classList.add("text-danger");
+          $('#APIResponse').modal('show');
+          console.log("No changes detected.");
           return;
         }
       
         const payload = {
           students_test_score: studentsTestScore,
-          subject_id: parseInt(subjectId, 10),
+          subject_code: `${subjectId}`,
         };
-        console.log(payload)
       
         const messageElement = document.getElementById("msgs");
       
@@ -579,7 +600,7 @@
               messageElement.innerHTML = data.message;
               messageElement.classList.remove("text-danger");
               messageElement.classList.add("text-success");
-              fetchTestScores(token, subjectId); // Refresh scores
+              fetchTestScores(token, `${subjectId}`); // Refresh scores
             } else {
               messageElement.innerHTML = data.error;
               messageElement.classList.remove("text-success");
@@ -765,15 +786,17 @@
 
       document.getElementById("sendIt").addEventListener("click", function () {
         const token = localStorage.getItem("authToken");
-        const messageElement = document.getElementById("msgss");
+        const messageElement = document.getElementById("msgs");
     
         // Get the selected exam type
         const selectedExamType = document.querySelector('input[name="examType"]:checked');
         if (!selectedExamType) {
+            $('#sendMassModal').modal('hide');
             // Show error message if no exam type is selected
             messageElement.innerHTML = "Please select an exam type.";
             messageElement.classList.remove("text-success");
             messageElement.classList.add("text-danger");
+            $('#APIResponse').modal('show');
             return;
         }
     
@@ -890,7 +913,7 @@
                 // Create smaller card HTML dynamically
                 const cardHTML = `
                 <div class="col-6 col-md-2">
-                  <div class="card card-stats subject-card text-center" data-id="${subject.subject_id}">
+                  <div class="card card-stats subject-card text-center" data-id="${subject.subject_code}">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
                       <div class="icon-container mb-2">
                         <i class="fas fa-book fa-2x"></i>
@@ -923,10 +946,10 @@
                   this.classList.add("selected");
                   this.setAttribute("aria-selected", "true");
       
-                  // Call fetchTestScores with the correct subject_id
+                  // Call fetchTestScores with the correct subject_code
                   const selectedSubjectId = this.getAttribute("data-id");
-                  currentSubjectID = selectedSubjectId;
-                  fetchTestScores(token, selectedSubjectId); 
+                  currentSubjectID = `${selectedSubjectId}`;
+                  fetchTestScores(token, `${selectedSubjectId}`); 
                 });
               });
             } else {
@@ -941,9 +964,9 @@
           });
       }
 
-      let students = []; // Store the fetched students globally
+    let students = []; // Store the fetched students globally
 
-      function fetchTestScores(token, selectedSubjectId) {
+    function fetchTestScores(token, selectedSubjectId) {
     fetch(`${apiUrl}/user/get/test-scores/${selectedSubjectId}`, {
         method: "GET",
         headers: {
@@ -979,6 +1002,7 @@
         console.error("Error fetching test scores:", error);
     });
 }
+
 
 // Function to populate the grade label dropdown
 function populateGradeLabelDropdown(students) {
@@ -1027,17 +1051,17 @@ function renderStudentTable(students) {
         let row = document.createElement("tr");
         row.innerHTML = `
             <td>${student.grade} ${student.grade_label}</td>
-            <td>${student.nsn}</td>
+            <td>${student.student_nsn}</td>
             <td>${student.name}</td>
             <td>${user.name} (${user.role})</td>
             <td>
-                <label for="floatInput-${student.student_id}">Positive float value (0 to 100):</label>
+                <label for="floatInput-${student.student_nsn}">Positive float value (0 to 100):</label>
                 <input
                     class="form-control score-input"
-                    data-student-id="${student.student_id}" 
+                    data-student-id="${student.student_nsn}" 
                     data-original-score="${score !== null ? score : 0}" 
                     type="text" 
-                    id="floatInput-${student.student_id}" 
+                    id="floatInput-${student.student_nsn}" 
                     value="${score !== null ? score.toFixed(1) : ''}" 
                     placeholder="0.0"
                 >
@@ -1047,7 +1071,7 @@ function renderStudentTable(students) {
         studentTable.appendChild(row);
 
         // Add validation event listener for the specific input
-        const scoreInput = row.querySelector(`#floatInput-${student.student_id}`);
+        const scoreInput = row.querySelector(`#floatInput-${student.student_nsn}`);
         scoreInput.addEventListener("input", (event) => {
             let value = event.target.value;
 
