@@ -1389,7 +1389,7 @@
             email: parentEmail
           }
       };
-  
+
       const messageElement = document.getElementById("msgs");
   
       // Make the PUT request to update student and parent data
@@ -1405,7 +1405,8 @@
           .then((data) => {
               if (data.success) {
                   // Success message
-                  messageElement.innerHTML = data.message;
+                  const formattedMessage = data.message.replace(/\n/g, '<br>');
+                  messageElement.innerHTML = formattedMessage;
                   messageElement.classList.remove("text-danger");
                   messageElement.classList.add("text-success");
                   $('#updateSPModal').modal('hide');

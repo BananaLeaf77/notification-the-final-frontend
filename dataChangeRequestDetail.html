@@ -627,7 +627,8 @@
           .then(data => {
             if (data.success) {
               // Show success message
-              messageElement.innerHTML = data.message;
+              const formattedMessage = data.message.replace(/\n/g, '<br>');
+              messageElement.innerHTML = formattedMessage;
               messageElement.classList.remove("text-danger");
               messageElement.classList.add("text-success");
               $('#APIResponse').modal('show');

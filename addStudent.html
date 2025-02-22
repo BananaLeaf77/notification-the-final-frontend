@@ -64,44 +64,53 @@
     </div>
     <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="confirmationModalLabel">Confirm Submission</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+        <div class="modal-content shadow-lg rounded-3">
+          <!-- Modal Header -->
+          <div class="modal-header bg-warning text-white">
+            <h5 class="modal-title fw-bold" id="confirmationModalLabel">Confirm Submission</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
-            <p>Please review the data before submitting:</p>
-            <div class="row">
-              <!-- Student Information (Left Side) -->
-              <div class="col-md-6">
-                <h5><b>Student Information</b></h5>
-                <ul class="list-unstyled">
-                  <li><strong>NSN:</strong> <span id="confirmStudentNSN"></span></li>
-                  <li><strong>Name:</strong> <span id="confirmStudentName"></span></li>
-                  <li><strong>Grade:</strong> <span id="confirmStudentGrade"></span></li>
-                  <li><strong>Grade Label:</strong> <span id="confirmStudentGradeLabel"></span></li>
-                  <li><strong>Telephone:</strong> <span id="confirmStudentTelephone"></span></li>
-                  <li><strong>Gender:</strong> <span id="confirmStudentGender"></span></li>
-                </ul>
-              </div>
     
-              <!-- Parent Data (Right Side) -->
-              <div class="col-md-6">
-                <h5><b>Parent Data</b></h5>
-                <ul class="list-unstyled">
-                  <li><strong>Name:</strong> <span id="confirmParentName"></span></li>
-                  <li><strong>Telephone:</strong> <span id="confirmParentTelephone"></span></li>
-                  <li><strong>Email:</strong> <span id="confirmParentEmail"></span></li>
-                  <li><strong>Gender:</strong> <span id="confirmParentGender"></span></li>
-                </ul>
+          <!-- Modal Body -->
+          <div class="modal-body">
+            <p class="text-muted">Please review the data before submitting:</p>
+    
+            <!-- Unified Box for Student & Parent Info -->
+            <div class="p-3 border rounded bg-light">
+              <div class="row">
+                <!-- Student Information -->
+                <div class="col-md-6">
+                  <h5 class="text-warning"><b>Student Information</b></h5>
+                  <ul class="list-unstyled">
+                    <li><strong>NSN:</strong> <span id="confirmStudentNSN"></span></li>
+                    <li><strong>Name:</strong> <span id="confirmStudentName"></span></li>
+                    <li><strong>Grade:</strong> <span id="confirmStudentGrade"></span></li>
+                    <li><strong>Grade Label:</strong> <span id="confirmStudentGradeLabel"></span></li>
+                    <li><strong>Telephone:</strong> <span id="confirmStudentTelephone"></span></li>
+                    <li><strong>Gender:</strong> <span id="confirmStudentGender"></span></li>
+                  </ul>
+                </div>
+    
+                <!-- Parent Information -->
+                <div class="col-md-6">
+                  <h5 class="text-warning"><b>Parent Data</b></h5>
+                  <ul class="list-unstyled">
+                    <li><strong>Name:</strong> <span id="confirmParentName"></span></li>
+                    <li><strong>Telephone:</strong> <span id="confirmParentTelephone"></span></li>
+                    <li><strong>Email:</strong> <span id="confirmParentEmail"></span></li>
+                    <li><strong>Gender:</strong> <span id="confirmParentGender"></span></li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="confirmSubmitButton">Submit</button>
+    
+          <!-- Modal Footer -->
+          <div class="modal-footer d-flex justify-content-between">
+            <button type="button" id="closeConfirmButton" class="btn btn-outline-secondary px-4" data-dismiss="modal">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-success px-4" id="confirmSubmitButton">Submit</button>
           </div>
         </div>
       </div>
@@ -631,79 +640,84 @@
       });
 
       document.getElementById('confirmSubmitButton').addEventListener('click', async () => {
-        const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("authToken");
 
-        // Prepare the data
-        const data = {
-          student: {
-            student_nsn: document.getElementById('studentNSN').value,
-            name: document.getElementById('studentName').value,
-            grade: parseInt(document.getElementById('studentGrade').value, 10),
-            grade_label: document.getElementById('studentGradeLabel').value,
-            gender: document.querySelector('input[name="studentGender"]:checked').value,
-            telephone: document.getElementById('studentTelephone').value,
-          },
-          parent: {
-            name: document.getElementById('parentName').value,
-            telephone: document.getElementById('parentTelephone').value,
-            email: document.getElementById('parentEmail').value || '',
-            gender: document.querySelector('input[name="parentGender"]:checked').value,
-          },
-        };
+  // Prepare the data
+  const data = {
+    student: {
+      student_nsn: document.getElementById('studentNSN').value,
+      name: document.getElementById('studentName').value,
+      grade: parseInt(document.getElementById('studentGrade').value, 10),
+      grade_label: document.getElementById('studentGradeLabel').value,
+      gender: document.querySelector('input[name="studentGender"]:checked').value,
+      telephone: document.getElementById('studentTelephone').value,
+    },
+    parent: {
+      name: document.getElementById('parentName').value,
+      telephone: document.getElementById('parentTelephone').value,
+      email: document.getElementById('parentEmail').value || '', // Default to empty string if email is null
+      gender: document.querySelector('input[name="parentGender"]:checked').value,
+    },
+  };
 
-        try {
-          const response = await fetch(`${apiUrl}/student-and-parent/insert`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': token,
-            },
-            body: JSON.stringify(data),
-          });
+  try {
+    // Send the request to the API
+    const response = await fetch(`${apiUrl}/student-and-parent/insert`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token,
+      },
+      body: JSON.stringify(data),
+    });
 
-          const responseData = await response.json();
-          const messageElement = document.getElementById("msgs");
+    const responseData = await response.json();
+    const messageElement = document.getElementById("msgs");
 
-          if (responseData.success) {
-            // Success message and form reset
-            messageElement.textContent = responseData.message;
-            messageElement.classList.remove("text-danger");
-            messageElement.classList.add("text-success");
+    if (response.ok && responseData.success) {
+      // Success: Display success message and reset the form
+      const formattedMessage = responseData.message.replace(/\n/g, '<br>');
+      messageElement.innerHTML = formattedMessage;
+      messageElement.classList.remove("text-danger");
+      messageElement.classList.add("text-success");
 
-            // Reset form fields
-            document.getElementById('student-parent-form').reset();
-          } else {
-            // Failure message with error details
-            let errorMessage = responseData.message + ":";
-            if (responseData.error && responseData.error.length > 0) {
-              errorMessage += "<ul>";
-              responseData.error.forEach(err => {
-                errorMessage += `<li>${err}</li>`;
-              });
-              errorMessage += "</ul>";
-            }
-            messageElement.innerHTML = errorMessage;
-            messageElement.classList.remove("text-success");
-            messageElement.classList.add("text-danger");
-          }
+      // Reset the form fields
+      document.getElementById('student-parent-form').reset();
+    } else {
+      // Failure: Display error message with details
+      let errorMessage = responseData.message || "An error occurred. Please try again.";
 
-          // Show the modal with the response message
-          $('#APIResponse').modal('show');
-        } catch (error) {
-          console.log("Error occurred:", error);
+      if (responseData.error && responseData.error.length > 0) {
+        errorMessage += "<ul>";
+        responseData.error.forEach(err => {
+          errorMessage += `<li>${err}</li>`;
+        });
+        errorMessage += "</ul>";
+      }
 
-          const messageElement = document.getElementById("msgs");
-          messageElement.textContent = "Error Occurred";
-          messageElement.classList.remove("text-success");
-          messageElement.classList.add("text-danger");
+      messageElement.innerHTML = errorMessage;
+      messageElement.classList.remove("text-success");
+      messageElement.classList.add("text-danger");
+    }
 
-          // Show the modal
-          $('#APIResponse').modal('show');
-        }
+    // Show the modal with the response message
+    $('#APIResponse').modal('show');
+  } catch (error) {
+    console.error("Error occurred:", error);
 
-        // Hide the confirmation modal
-        $('#confirmationModal').modal('hide');
-      });
+    // Display a generic error message
+    const messageElement = document.getElementById("msgs");
+    messageElement.textContent = "An unexpected error occurred. Please try again later.";
+    messageElement.classList.remove("text-success");
+    messageElement.classList.add("text-danger");
+
+    // Show the modal
+    $('#APIResponse').modal('show');
+  } finally {
+    // Hide the confirmation modal
+    $('#confirmationModal').modal('hide');
+  }
+});
       
 $(document).ready(function() {
   // Ensure the confirmation modal can be closed
@@ -841,11 +855,11 @@ $(document).ready(function() {
       });
       
       $(document).ready(function() {
-        // Ensure the confirmation modal can be closed
-        $('#confirmationModal .close, #confirmationModal .btn-secondary').on('click', function() {
-          $('#confirmationModal').modal('hide');
+        $('.btn-close, .btn-outline-secondary').on('click', function() {
+            $('#confirmationModal').modal('hide');
         });
       });
+      
     </script>
   </body>
 </html>
