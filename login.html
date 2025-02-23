@@ -515,7 +515,8 @@
                         $('#createDCRModal').modal('hide');
 
                     } else {
-                        messageElement.innerHTML = data.error;
+                        const formattedMessage = data.error.replace(/\n/g, '<br>');
+                        messageElement.innerHTML = formattedMessage;
                         messageElement.classList.remove("text-success");
                         messageElement.classList.add("text-danger");
                     }
