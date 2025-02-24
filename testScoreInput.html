@@ -562,7 +562,8 @@
       
       function saveTestScores(token, subjectId) {
         const scoreInputs = document.querySelectorAll(".score-input");
-      
+        console.log("score input")
+        console.log(scoreInputs)
         const studentsTestScore = Array.from(scoreInputs)
           .map((input) => {
             const studentId = input.getAttribute("data-student-id");
@@ -594,7 +595,7 @@
           students_test_score: studentsTestScore,
           subject_code: `${subjectId}`,
         };
-      
+        console.log(payload)
         const messageElement = document.getElementById("msgs");
       
         // Send the POST request
