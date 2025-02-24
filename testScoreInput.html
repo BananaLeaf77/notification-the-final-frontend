@@ -562,8 +562,6 @@
       
       function saveTestScores(token, subjectId) {
         const scoreInputs = document.querySelectorAll(".score-input");
-        console.log("score input")
-        console.log(scoreInputs)
         const studentsTestScore = Array.from(scoreInputs)
           .map((input) => {
             const studentId = input.getAttribute("data-student-id");
@@ -587,7 +585,6 @@
           messageElement.classList.remove("text-success");
           messageElement.classList.add("text-danger");
           $('#APIResponse').modal('show');
-          console.log("No changes detected.");
           return;
         }
       
@@ -843,7 +840,6 @@
         .then(data => {
             // Hide the loading spinner modal after receiving a response
             $('#loadingModal').modal('hide');
-            console.log(data);
             if (data.success) {
                 messageElement.innerHTML = data.message;
                 messageElement.classList.remove("text-danger");
