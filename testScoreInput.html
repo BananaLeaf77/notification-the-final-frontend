@@ -802,7 +802,17 @@
       document.getElementById("sendIt").addEventListener("click", function () {
         const token = localStorage.getItem("authToken");
         const messageElement = document.getElementById("msgs");
-    
+
+        // Function to hide loading modal safely
+        function hideLoadingModal() {
+            // Try multiple approaches to ensure it hides
+            $('#loadingModal').modal('hide');
+            $('#loadingModal').removeClass('show');
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').css('padding-right', '');
+        }
+
         // Get the selected exam type
         const selectedExamType = document.querySelector('input[name="examType"]:checked');
         if (!selectedExamType) {
@@ -814,19 +824,16 @@
             $('#APIResponse').modal('show');
             return;
         }
-    
+
         const payload = {
             exam_type: selectedExamType.value, // Get the value of the selected radio button
         };
         
-        // Reference the loading modal and the spinner element
-        const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
-    
-        // Show the loading spinner modal before sending the request
+        // Hide send mass modal and show the loading spinner modal
         $('#sendMassModal').modal('hide');
         $('#loadingModal').modal('show');
         
-    
+
         // Send the notification
         fetch(`${apiUrl}/sender/send-mass/exam-result`, {
             method: "POST",
@@ -839,7 +846,8 @@
         .then(response => response.json())
         .then(data => {
             // Hide the loading spinner modal after receiving a response
-            $('#loadingModal').modal('hide');
+            hideLoadingModal();
+            
             if (data.success) {
                 messageElement.innerHTML = data.message;
                 messageElement.classList.remove("text-danger");
@@ -849,8 +857,8 @@
                 messageElement.classList.remove("text-success");
                 messageElement.classList.add("text-danger");
             }
-    
-            // Hide the send mass modal
+
+            // Hide the send mass modal (redundant since we already hide it above, but keeping for safety)
             $('#sendMassModal').modal('hide');
             
             $('#APIResponse').modal('show');
@@ -858,19 +866,18 @@
         })
         .catch(error => {
             console.error("Error sending notification:", error);
-    
+
             // Hide the loading spinner modal on error
-            loadingModal.hide();
-    
+            hideLoadingModal();
+
             messageElement.innerHTML = "An error occurred while sending notifications.";
             messageElement.classList.remove("text-success");
             messageElement.classList.add("text-danger");
-    
-            // Show the response modal
-            const apiResponseModal = new bootstrap.Modal(document.getElementById("APIResponseRefresh"));
-            apiResponseModal.show();
+
+            // Show the response modal - fixed to use APIResponse instead of APIResponseRefresh
+            $('#APIResponse').modal('show');
         });
-      });
+    });
     
 
       let loggedID

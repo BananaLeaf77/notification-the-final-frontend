@@ -1161,11 +1161,15 @@
       });
 
       $(document).ready(function() {
-        // Ensure both buttons trigger modal hiding
+        // Ensure both buttons trigger modal hiding and reset checkboxes
         $('.close, .btn-secondary').on('click', function() {
             $('#massDeleteConfirmationModal').modal('hide');
+
+            // Reset all checkboxes in the subject list
+            $('.form-check-input').prop('checked', false);
         });
       });
+
     </script>
   </body>
 </html>
