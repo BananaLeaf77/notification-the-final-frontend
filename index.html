@@ -1172,44 +1172,49 @@
 
       let students = [];
 
-        function fetchStudents(token) {
-        fetch(`${apiUrl}/student/get-all`, {
-            method: "GET",
-            headers: {
-                "Authorization": token,
-                "Content-Type": "application/json"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                students = data.data;
+      function fetchStudents(token) {
+            fetch(`${apiUrl}/student/get-all`, {
+                method: "GET",
+                headers: {
+                    "Authorization": token, 
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    students = data.data;
 
-                // Sort students by grade and grade label
-                students.sort((a, b) => {
-                    let gradeA = parseInt(a.grade);
-                    let gradeB = parseInt(b.grade);
+                    // Sort students by grade, grade label, and then by name (A-Z)
+                    students.sort((a, b) => {
+                        let gradeA = parseInt(a.grade);
+                        let gradeB = parseInt(b.grade);
 
-                    if (gradeA !== gradeB) {
-                        return gradeA - gradeB; // Sort numerically first
-                    }
+                        if (gradeA !== gradeB) {
+                            return gradeA - gradeB; 
+                        }
 
-                    let labelA = a.grade_label || ""; // Handle cases where grade_label is missing
-                    let labelB = b.grade_label || "";
+                        let labelA = a.grade_label || "";
+                        let labelB = b.grade_label || "";
 
-                    return labelA.localeCompare(labelB); // Sort alphabetically
-                });
+                        if (labelA !== labelB) {
+                            return labelA.localeCompare(labelB); // Sort alphabetically by grade label
+                        }
 
-                console.log("Sorted students:", students);
-                initializeFiltersAndTable();
-            } else {
-                console.error("Failed to fetch students:", data.message);
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching students:", error);
-        });
+                        return a.name.localeCompare(b.name); // Finally, sort by student name alphabetically (A-Z)
+                    });
+
+                    console.log("Sorted students:", students);
+                    initializeFiltersAndTable();
+                } else {
+                    console.error("Failed to fetch students:", data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching students:", error);
+            });
         }
+
 
         // Initialize filters and table
         function initializeFiltersAndTable() {
