@@ -1220,7 +1220,7 @@
                 studentClass = student.grade + " " + student.grade_label;
                 const row = document.createElement('tr');
                 row.addEventListener("click", () => {
-                    window.location.href = `detailStudent.html?student_nsn=${student.student_nsn}`; // Ensure this is a string
+                    window.location.href = `staffDetailStudent.html?student_nsn=${student.student_nsn}`; // Ensure this is a string
                 });
                 row.innerHTML = `
                     <td>
