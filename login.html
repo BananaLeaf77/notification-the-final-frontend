@@ -91,61 +91,6 @@
 </head>
 <body>
 <!-- DCR MODAL -->
-<div class="modal fade" id="createDCRModal" tabindex="-1" aria-labelledby="createDCRModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <h5 class="modal-title" id="createDCRModalLabel">Parent Data Change Request</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="modal-body">
-                <div class="row">
-                    <!-- Right Side: Parent Info -->
-                    <div class="col-12">
-                        <div class="form-group">
-                            <label for="modalNewParentName">New Parent Name (optional)</label>
-                            <input type="text" class="form-control" id="modalNewParentName" placeholder="New Parent Name" maxlength="150">
-                        </div>
-                        <div class="form-group">
-                            <label for="modalParentGender">Gender (optional)</label><br>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="modalNewParentGenderMale" name="ParentGender" value="male" class="custom-control-input">
-                                <label class="custom-control-label" for="modalNewParentGenderMale">Male</label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="modalNewParentGenderFemale" name="ParentGender" value="female" class="custom-control-input">
-                                <label class="custom-control-label" for="modalNewParentGenderFemale">Female</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="modalNewParentTelephone">New Parent Telephone (optional)</label>
-                            <input type="text" class="form-control" id="modalNewParentTelephone" placeholder="08xx" oninput="validateTelephone(this)" maxlength="13">
-                        </div>
-                        <div class="form-group">
-                            <label for="modalParentEmail">Parent Email (optional)</label>
-                            <input type="email" class="form-control" id="modalNewParentEmail" placeholder="New Parent Email" maxlength="255">
-                        </div>
-                        <div class="form-group">
-                            <label for="modalOldParentTelephone">Old Parent Telephone <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="modalOldParentTelephone" placeholder="08xx" oninput="validateTelephone(this)" maxlength="13"" required>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success" id="sendDCR">Send Request</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
     <!-- API Response Modal -->
@@ -379,10 +324,6 @@
         </div>
         </div>
     </div>
-    <div class="custom-toggle" onclick="showDCRModal()">
-        <i class="fab fa-telegram-plane"></i>
-    </div>
-    
     </div>
     <!-- End Custom template -->
 </div>
@@ -471,73 +412,6 @@
           input.value = input.value.slice(0, 13);
         }
       }
-
-    document.getElementById("sendDCR").addEventListener("click", function () {
-        // Get input values from the modal form
-        const oldParentTelephone = document.getElementById("modalOldParentTelephone").value.trim();
-        const newParentName = document.getElementById("modalNewParentName").value.trim();
-        const newParentGender = document.querySelector('input[name="ParentGender"]:checked')?.value;
-        const newParentTelephone = document.getElementById("modalNewParentTelephone").value.trim();
-        const newParentEmail = document.getElementById("modalNewParentEmail").value.trim();
-        const messageElement = document.getElementById("msgs");
-
-        // Validate required fields
-        if (!oldParentTelephone) {
-            messageElement.innerHTML = "Old Parent Telephone is required.";
-            messageElement.classList.remove("text-success");
-            messageElement.classList.add("text-danger");
-            $('#APIResponse').modal('show');
-            return;
-        }
-    
-        // Construct the payload dynamically
-        const payload = { old_parent_telephone: oldParentTelephone };
-    
-        if (newParentName) payload.new_parent_name = newParentName;
-        if (newParentGender) payload.new_parent_gender = newParentGender;
-        if (newParentTelephone) payload.new_parent_telephone = newParentTelephone;
-        if (newParentEmail) payload.new_parent_email = newParentEmail;
-    
-        // Send the request to the endpoint
-        fetch(`${apiUrl}/student-and-parent/req/data-change-request`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        })
-            .then(response => response.json())
-            .then(data => {
-                    if (data.success) {
-                        messageElement.innerHTML = data.message;
-                        messageElement.classList.remove("text-danger");
-                        messageElement.classList.add("text-success");
-                        $('#createDCRModal').modal('hide');
-
-                    } else {
-                        const formattedMessage = data.error.replace(/\n/g, '<br>');
-                        messageElement.innerHTML = formattedMessage;
-                        messageElement.classList.remove("text-success");
-                        messageElement.classList.add("text-danger");
-                    }
-                    // Show the response modal
-                    const apiResponseModal = new bootstrap.Modal(document.getElementById("APIResponse"));
-                    apiResponseModal.show();
-                    
-                })
-                .catch(error => {
-                    console.error("Error sending parent data change request:", error);
-        
-                    messageElement.innerHTML = "An error occurred while sending parent data change request.";
-                    messageElement.classList.remove("text-success");
-                    messageElement.classList.add("text-danger");
-        
-                    // Show the response modal
-                    const apiResponseModal = new bootstrap.Modal(document.getElementById("APIResponse"));
-                    apiResponseModal.show();
-                });
-    });
-    
 
     document.getElementById("loginForm").addEventListener("submit", function(e) {
         e.preventDefault();

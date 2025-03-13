@@ -235,7 +235,7 @@
                 </span>
                 <h4 class="text-section">Components</h4>
               </li>
-              <li class="nav-item active">
+              <li class="nav-item">
                 <a href="testScoreInput.html">
                   <i class="fas fa-pen"></i>
                   <p>Test Score Input</p>
@@ -259,7 +259,7 @@
                   <p>Attendance History</p>
                 </a>               
               </li>            
-              <li class="nav-item">
+              <li class="nav-item active">
                 <a href="testScoreSentHistory.html">
                   <i class="fas fa-history"></i>
                   <p>Test Score History</p>
@@ -404,64 +404,54 @@
 
         <div class="container">
           <div class="page-inner">
-            <div
-              class="d-flex align-items-left align-items-md-center flex-column flex-md-row"
-            >
-              <div>
-                <h3 class="fw-bold">Midterm / Final Test Scores Input</h3>
-              </div>
-              
-            </div>
-            <div class="row" id="teachingSubjectsRow">
-              <!-- Cards will be dynamically inserted here -->
-            </div>
             <div class="row">
               <div class="col-md-12">
-                <div class="card card-round">
+                <div class="card">
                   <div class="card-header">
-                    <div class="card-head-row card-tools-still-right">
-                      <h4 class="card-title">Student List</h4>
-                      <div class="card-tools d-flex justify-content-between align-items-center">
-                        <div>
-                          <a class="btn btn-success btn-round" id="saveChangesBtn">
-                            <i class="fas fa-save"></i> Save Changes
-                          </a>
-                        </div>
-                        <div class="timeline-badge">
-                          <a href="#" class="btn btn-primary btn-round" onclick="showSendMassExamInfo()">
-                            <i class="far fa-paper-plane"></i> Send
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Grade Label Dropdown -->
-                    <p>Filter by Grade Label:</p>
-                    <select id="gradeLabelDropdown" class="form-select">
-                        <option value="">All</option>
-                        <!-- Options will be dynamically added here -->
-                    </select>
-                    </p>
+                    <h4 class="card-title">Test Score History</h4>
                   </div>
                   <div class="card-body">
-                    <div class="row">
-                      <div class="col-md-13">
-                        <div class="table-responsive table-hover table-sales">
-                          <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                  <th>Class</th>
-                                  <th>NSN</th>
-                                  <th>Name</th>
-                                  <th>Latest Change By</th>
-                                  <th>Input Score</th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentTable">
-                                <!-- Dynamic rows will be populated here -->
-                            </tbody>
-                          </table>
-                        </div>
+                    <div class="row mb-3">
+                      <div class="col-md-3">
+                        <label for="gradeFilter">Grade</label>
+                        <select class="form-control" id="gradeFilter">
+                          <option value="">All Grades</option>
+                        </select>
                       </div>
+                      <div class="col-md-3">
+                        <label for="subjectFilter">Subject</label>
+                        <select class="form-control" id="subjectFilter">
+                          <option value="">All Subjects</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label for="examTypeFilter">Exam Type</label>
+                        <select class="form-control" id="examTypeFilter">
+                          <option value="">All Types</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label for="searchInput">Search</label>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by name...">
+                      </div>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>Sent Date</th>
+                            <th>Student Name</th>
+                            <th>Grade</th>
+                            <th>Subject</th>
+                            <th>Score</th>
+                            <th>Type</th>
+                            <th>Score Input By</th>
+                          </tr>
+                        </thead>
+                        <tbody id="testScoreTable">
+                          <!-- Table content will be dynamically populated -->
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
@@ -566,77 +556,6 @@
         $('#logoutConfirmationModal').modal('show');
       }
       
-      function saveTestScores(token, subjectId) {
-        const scoreInputs = document.querySelectorAll(".score-input");
-        const studentsTestScore = Array.from(scoreInputs)
-          .map((input) => {
-            const studentId = input.getAttribute("data-student-id");
-            const newScore = parseFloat(input.value);
-            const originalScore = parseFloat(input.getAttribute("data-original-score"));
-      
-            // Only include students with modified scores (different from the original)
-            if (!isNaN(newScore) && newScore !== originalScore) {
-              return { student_nsn: studentId, test_score: newScore };
-            }
-      
-            return null;
-          })
-          .filter((entry) => entry !== null); // Remove null entries
-      
-        // If no scores have been updated, return early
-        if (studentsTestScore.length === 0) {
-          $('#saveChangesModal').modal('hide');
-          const messageElement = document.getElementById("msgs");
-          messageElement.innerHTML = "No changes detected.";
-          messageElement.classList.remove("text-success");
-          messageElement.classList.add("text-danger");
-          $('#APIResponse').modal('show');
-          return;
-        }
-      
-        const payload = {
-          students_test_score: studentsTestScore,
-          subject_code: `${subjectId}`,
-        };
-        console.log(payload)
-        const messageElement = document.getElementById("msgs");
-      
-        // Send the POST request
-        fetch(`${apiUrl}/user/input-test-scores`, {
-          method: "POST",
-          headers: {
-            Authorization: token,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then((data) => {
-            if (data.success) {
-              messageElement.innerHTML = data.message;
-              messageElement.classList.remove("text-danger");
-              messageElement.classList.add("text-success");
-              fetchTestScores(token, `${subjectId}`); // Refresh scores
-            } else {
-              messageElement.innerHTML = data.error;
-              messageElement.classList.remove("text-success");
-              messageElement.classList.add("text-danger");
-            }
-            $('#saveChangesModal').modal('hide');
-            const apiResponseModal = new bootstrap.Modal(document.getElementById("APIResponse"));
-            apiResponseModal.show();
-          })
-          .catch((error) => {
-            console.error("Error saving test scores:", error);
-          });
-      }
-      
-
       // Event listener for confirming logout
       document.getElementById("confirmLogoutButton").addEventListener("click", function () {
           // Remove the token from local storage
@@ -763,178 +682,11 @@
         });
       }
 
-      function showSendMassExamInfo() {
-        const messageElement = document.getElementById("msgs");
-        const examType = document.getElementById("examType");
-        examType.innerHTML = ""; // Clear existing content
-    
-        // Create UTS, UAS radio buttons and custom input
-        const examTypeRadio = `
-            <div class="form-check">
-                <input 
-                    class="form-check-input" 
-                    type="radio" 
-                    name="examType" 
-                    id="UTS" 
-                    value="Midterm Tests">
-                <label class="form-check-label" for="UTS">
-                    Midterm Tests
-                </label>
-            </div>
-            <div class="form-check">
-                <input 
-                    class="form-check-input" 
-                    type="radio" 
-                    name="examType" 
-                    id="UAS" 
-                    value="End of Semester Tests">
-                <label class="form-check-label" for="UAS">
-                    End of Semester Tests
-                </label>
-            </div>
-            <div class="form-check">
-                <input 
-                    class="form-check-input" 
-                    type="radio" 
-                    name="examType" 
-                    id="customExam" 
-                    value="custom">
-                <label class="form-check-label" for="customExam">
-                    Other
-                </label>
-                <input 
-                    type="text" 
-                    class="form-control mt-2" 
-                    id="customExamInput" 
-                    maxlength="50" 
-                    placeholder="Enter exam type (max 50 chars)"
-                    style="display: none;">
-                <small id="charCount" class="text-muted" style="display: none;">50 characters remaining</small>
-            </div>
-        `;
-    
-        // Add the radio buttons to the `examType` element
-        examType.innerHTML = examTypeRadio;
-
-        // Add event listeners
-        const customRadio = document.getElementById('customExam');
-        const customInput = document.getElementById('customExamInput');
-        const charCount = document.getElementById('charCount');
-
-        document.querySelectorAll('input[name="examType"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.id === 'customExam') {
-                    customInput.style.display = 'block';
-                    charCount.style.display = 'block';
-                    customInput.focus();
-                } else {
-                    customInput.style.display = 'none';
-                    charCount.style.display = 'none';
-                }
-            });
-        });
-
-        customInput.addEventListener('input', function() {
-            const remaining = 50 - this.value.length;
-            charCount.textContent = `${remaining} characters remaining`;
-        });
-
-        // Show the modal
-        $('#sendMassModal').modal('show');
-      }
-    
-      document.getElementById("closeSendMassModal").addEventListener("click", function () {
-        $('#sendMassModal').modal('hide');
-      });
-
-      document.getElementById("sendIt").addEventListener("click", async function () {
-        const selectedExamType = document.querySelector('input[name="examType"]:checked');
-        
-        if (!selectedExamType) {
-            const messageElement = document.getElementById("msgs");
-            messageElement.innerHTML = "Please select an exam type";
-            messageElement.classList.remove("text-success");
-            messageElement.classList.add("text-danger");
-            $('#APIResponse').modal('show');
-            return;
-        }
-
-        let examTypeValue = selectedExamType.value;
-        
-        // Handle custom exam type
-        if (selectedExamType.id === 'customExam') {
-            const customInput = document.getElementById('customExamInput');
-            if (!customInput.value.trim()) {
-                const messageElement = document.getElementById("msgs");
-                messageElement.innerHTML = "Please enter a custom exam type";
-                messageElement.classList.remove("text-success");
-                messageElement.classList.add("text-danger");
-                $('#APIResponse').modal('show');
-                return;
-            }
-            examTypeValue = customInput.value.trim();
-        }
-        console.log(examTypeValue);
-        // Show loading modal
-        $('#loadingModal').modal('show');
-        $('#sendMassModal').modal('hide');
-
-        try {
-            const response = await fetch(`${apiUrl}/sender/send-mass/exam-result`, {
-                method: "POST",
-                headers: {
-                    "Authorization": token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    exam_type: examTypeValue
-                })
-            });
-
-            const data = await response.json();
-            $('#loadingModal').modal('hide');
-
-            const messageElement = document.getElementById("msgss");
-            if (data.success) {
-                messageElement.innerHTML = "Test scores sent successfully!";
-                messageElement.classList.remove("text-danger");
-                messageElement.classList.add("text-success");
-            } else {
-                messageElement.innerHTML = data.error || "Failed to send test scores";
-                messageElement.classList.remove("text-success");
-                messageElement.classList.add("text-danger");
-            }
-            $('#APIResponseRefresh').modal('show');
-        } catch (error) {
-            $('#loadingModal').modal('hide');
-            const messageElement = document.getElementById("msgs");
-            messageElement.innerHTML = error;
-            messageElement.classList.remove("text-success");
-            messageElement.classList.add("text-danger");
-            $('#APIResponse').modal('show');
-        }
-      });
-    
-
       let loggedID
       let loggedRole 
       
       let selectedSubjectId = null; 
       let currentSubjectID = null;
-
-
-      document.getElementById("saveChangesBtn").addEventListener("click", () => {
-        $('#saveChangesModal').modal('show');
-      });
-
-      document.getElementById("closeSaveChanges").addEventListener("click", () => {
-        $('#saveChangesModal').modal('hide');
-      });
-
-      document.getElementById("confirmYesSaveChanges").addEventListener("click", () => {
-        saveTestScores(token, currentSubjectID);
-      });
-
 
       function fetchTeachingSubjects(token) {
         const endpoint = `${apiUrl}/user/show-user-assigned-subject`;
@@ -1239,6 +991,171 @@ function renderStudentTable(students) {
         });
       });
 
+    </script>
+    <script>
+      let allTestScores = [];
+
+      function showLogoutModal() {
+        $('#logoutConfirmationModal').modal('show');
+      }
+
+      function logout() {
+        localStorage.removeItem("authToken");
+        window.location.href = "login.html";
+      }
+
+      function fetchTestScoreHistory(token) {
+        fetch(`${apiUrl}/user/get-all/test-scores-history`, {
+          method: "GET",
+          headers: {
+            "Authorization": token,
+            "Content-Type": "application/json",
+          },
+        })
+        .then(response => {
+          if (!response.ok) {
+            if (response.status === 401) {
+              $('#unauthorizedModal').modal('show');
+              return;
+            }
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            allTestScores = data.data;
+            updateFilters(allTestScores);
+            displayFilteredData(allTestScores);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching test score history:', error);
+          const messageElement = document.getElementById("msgs");
+          messageElement.innerHTML = "Error fetching test score history. Please try again.";
+          messageElement.classList.remove("text-success");
+          messageElement.classList.add("text-danger");
+          $('#APIResponse').modal('show');
+        });
+      }
+
+      function updateFilters(data) {
+        // Update grade filter
+        const grades = [...new Set(data.map(item => `${item.student.grade}${item.student.grade_label}`))];
+        grades.sort((a, b) => {
+          const gradeA = parseInt(a);
+          const gradeB = parseInt(b);
+          if (gradeA !== gradeB) return gradeA - gradeB;
+          return a.localeCompare(b);
+        });
+        const gradeFilter = document.getElementById('gradeFilter');
+        gradeFilter.innerHTML = '<option value="">All Grades</option>';
+        grades.forEach(grade => {
+          gradeFilter.innerHTML += `<option value="${grade}">${grade}</option>`;
+        });
+
+        // Update subject filter
+        const subjects = [...new Set(data.map(item => item.subject.name))];
+        subjects.sort();
+        const subjectFilter = document.getElementById('subjectFilter');
+        subjectFilter.innerHTML = '<option value="">All Subjects</option>';
+        subjects.forEach(subject => {
+          subjectFilter.innerHTML += `<option value="${subject}">${subject}</option>`;
+        });
+
+        // Update exam type filter
+        const examTypes = [...new Set(data.map(item => item.type))];
+        examTypes.sort();
+        const examTypeFilter = document.getElementById('examTypeFilter');
+        examTypeFilter.innerHTML = '<option value="">All Types</option>';
+        examTypes.forEach(type => {
+          examTypeFilter.innerHTML += `<option value="${type}">${type}</option>`;
+        });
+      }
+
+      function displayFilteredData(data) {
+        const gradeFilter = document.getElementById('gradeFilter').value;
+        const subjectFilter = document.getElementById('subjectFilter').value;
+        const examTypeFilter = document.getElementById('examTypeFilter').value;
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+
+        // Filter data
+        let filteredData = data.filter(item => {
+          const grade = `${item.student.grade}${item.student.grade_label}`;
+          const matchesGrade = !gradeFilter || grade === gradeFilter;
+          const matchesSubject = !subjectFilter || item.subject.name === subjectFilter;
+          const matchesType = !examTypeFilter || item.type === examTypeFilter;
+          const matchesSearch = !searchText || 
+            item.student.name.toLowerCase().includes(searchText) ||
+            item.subject.name.toLowerCase().includes(searchText);
+          return matchesGrade && matchesSubject && matchesType && matchesSearch;
+        });
+
+        // Sort data by grade, subject, and student name
+        filteredData.sort((a, b) => {
+          // First sort by grade
+          const gradeA = `${a.student.grade}${a.student.grade_label}`;
+          const gradeB = `${b.student.grade}${b.student.grade_label}`;
+          if (gradeA !== gradeB) return gradeA.localeCompare(gradeB);
+          
+          // Then by subject
+          if (a.subject.name !== b.subject.name) return a.subject.name.localeCompare(b.subject.name);
+          
+          // Finally by student name
+          return a.student.name.localeCompare(b.student.name);
+        });
+
+        const testScoreTable = document.getElementById('testScoreTable');
+        testScoreTable.innerHTML = '';
+
+        filteredData.forEach(record => {
+          const sentDate = new Date(record.sent_at);
+          const formattedDate = sentDate.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${formattedDate}</td>
+            <td>${record.student.name}</td>
+            <td>${record.student.grade}${record.student.grade_label}</td>
+            <td>${record.subject.name}</td>
+            <td>${record.score}</td>
+            <td>${record.type}</td>
+            <td>${record.user.name} (${record.user.role})</td>
+          `;
+          testScoreTable.appendChild(row);
+        });
+      }
+
+      // Event listeners for filters
+      document.getElementById('gradeFilter').addEventListener('change', () => displayFilteredData(allTestScores));
+      document.getElementById('subjectFilter').addEventListener('change', () => displayFilteredData(allTestScores));
+      document.getElementById('examTypeFilter').addEventListener('change', () => displayFilteredData(allTestScores));
+      document.getElementById('searchInput').addEventListener('input', () => displayFilteredData(allTestScores));
+
+      // Initialize when document is ready
+      $(document).ready(function() {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        fetchTestScoreHistory(token);
+
+        // Modal close handlers
+        $('.close, .btn-secondary').on('click', function() {
+          $('#logoutConfirmationModal').modal('hide');
+          $('#APIResponse').modal('hide');
+          $('#unauthorizedModal').modal('hide');
+        });
+      });
     </script>
   </body>
 </html>

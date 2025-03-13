@@ -248,6 +248,12 @@
                   <p>Attendance History</p>
                 </a>               
               </li>            
+              <li class="nav-item">
+                <a href="testScoreSentHistory.html">
+                  <i class="fas fa-history"></i>
+                  <p>Test Score History</p>
+                </a>               
+              </li>            
             </ul>
           </div>
         </div>
@@ -710,7 +716,7 @@
         fetch(`${apiUrl}/student-and-parent/get-all-data-change-request`, {
           method: "GET",
           headers: {
-              "Authorization": `${token}`,
+              "Authorization": token,
               "Content-Type": "application/json"
           }
         })

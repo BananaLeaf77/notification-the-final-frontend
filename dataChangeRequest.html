@@ -275,6 +275,12 @@
                   <p>Attendance History</p>
                 </a>               
               </li>            
+              <li class="nav-item">
+                <a href="testScoreSentHistory.html">
+                  <i class="fas fa-history"></i>
+                  <p>Test Score History</p>
+                </a>               
+              </li>           
             </ul>
           </div>
         </div>
@@ -439,9 +445,10 @@
                           <table class="table table-striped">
                               <thead>
                                   <tr>
-                                      <th>Sent Date</th>
-                                      <th>Parent Telephone</th>
-                                      <th>Action</th>
+                                    <th>Sent Date</th>
+                                    <th>Request By</th>
+                                    <th>Parent Telephone</th>
+                                    <th>Action</th>
                                   </tr>
                               </thead>
                               <tbody id="dcrTable">
@@ -634,6 +641,7 @@
     
                         row.innerHTML = `
                             <td>${date}</td>
+                            <td>${record.user.name} (${record.user.role})</td>
                             <td>${record.old_parent_telephone}</td>
                             <td>
                                 <button class="btn btn-danger btn-sm delete-btn" onclick="showDeleteModal(${record.request_id}, '${record.old_parent_telephone}')">Delete</button>
